@@ -15,8 +15,15 @@ export function FuturisticBackground() {
   const containerRef = useRef<HTMLDivElement>(null);
   const { temperature, theme } = useModelSettings();
   const [mouse, setMouse] = useState({ x: 0, y: 0, targetX: 0, targetY: 0 });
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize, { passive: true });
+
     const handleMouseMove = (e: MouseEvent) => {
       setMouse((prev) => ({
         ...prev,
@@ -25,27 +32,34 @@ export function FuturisticBackground() {
       }));
     };
 
-    window.addEventListener("mousemove", handleMouseMove, { passive: true });
-
     let rafId: number;
-    const smoothMouse = () => {
-      setMouse((prev) => {
-        const dx = prev.targetX - prev.x;
-        const dy = prev.targetY - prev.y;
-        return {
-          ...prev,
-          x: prev.x + dx * 0.07,
-          y: prev.y + dy * 0.07,
-        };
-      });
-      rafId = requestAnimationFrame(smoothMouse);
-    };
+    const isMobileViewport = window.innerWidth < 768;
 
-    rafId = requestAnimationFrame(smoothMouse);
+    if (!isMobileViewport) {
+      window.addEventListener("mousemove", handleMouseMove, { passive: true });
+
+      const smoothMouse = () => {
+        setMouse((prev) => {
+          const dx = prev.targetX - prev.x;
+          const dy = prev.targetY - prev.y;
+          return {
+            ...prev,
+            x: prev.x + dx * 0.07,
+            y: prev.y + dy * 0.07,
+          };
+        });
+        rafId = requestAnimationFrame(smoothMouse);
+      };
+
+      rafId = requestAnimationFrame(smoothMouse);
+    }
 
     return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      cancelAnimationFrame(rafId);
+      window.removeEventListener("resize", handleResize);
+      if (!isMobileViewport) {
+        window.removeEventListener("mousemove", handleMouseMove);
+        cancelAnimationFrame(rafId);
+      }
     };
   }, []);
 
@@ -195,13 +209,15 @@ export function FuturisticBackground() {
       </div>
 
       {/* 2. Soft Mouse Tracking Glow Overlay (Sleek light-source tracking) */}
-      <div
-        className={`absolute w-[600px] h-[600px] rounded-full pointer-events-none filter blur-[80px] transition-opacity duration-500 ${theme === "dark" ? "opacity-100 bg-radial-gradient from-blue-500/4 via-indigo-500/1 to-transparent" : "opacity-30 bg-radial-gradient from-blue-400/8 via-cyan-400/2 to-transparent"}`}
-        style={{
-          transform: `translate3d(${mouse.x - 300}px, ${mouse.y - 300}px, 0)`,
-          willChange: "transform",
-        }}
-      />
+      {!isMobile && (
+        <div
+          className={`absolute w-[600px] h-[600px] rounded-full pointer-events-none filter blur-[80px] transition-opacity duration-500 ${theme === "dark" ? "opacity-100 bg-radial-gradient from-blue-500/4 via-indigo-500/1 to-transparent" : "opacity-30 bg-radial-gradient from-blue-400/8 via-cyan-400/2 to-transparent"}`}
+          style={{
+            transform: `translate3d(${mouse.x - 300}px, ${mouse.y - 300}px, 0)`,
+            willChange: "transform",
+          }}
+        />
+      )}
 
       {/* 3. Canvas stardust particles */}
       <canvas

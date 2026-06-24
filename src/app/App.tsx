@@ -19,8 +19,9 @@ import { NeuralNetwork } from "./components/NeuralNetwork";
 import { AskYounesAi } from "./components/AskYounesAi";
 import { TokenizerPlayground } from "./components/TokenizerPlayground";
 import { TelemetryWave } from "./components/TelemetryWave";
-import { HeroVisual } from "./components/HeroVisual";
+import { InteractiveScene3D } from "./components/InteractiveScene3D";
 import { Skills } from "./components/Skills";
+import { BackToTopButton } from "./components/BackToTopButton";
 
 // ─── Translations ─────────────────────────────────────────────
 const T = {
@@ -458,6 +459,34 @@ function useActiveSection(ids: string[]) {
   return active;
 }
 
+// ─── Staggered Neon Character Reveal Component ───────────────
+function StaggerText({ text, delay = 0 }: { text: string; delay?: number }) {
+  const words = text.split(" ");
+  return (
+    <span className="inline-block">
+      {words.map((word, wIdx) => (
+        <span key={wIdx} className="inline-block mr-[0.22em] whitespace-nowrap">
+          {word.split("").map((char, cIdx) => (
+            <motion.span
+              key={cIdx}
+              initial={{ opacity: 0, y: 15, filter: "blur(4px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              transition={{
+                duration: 0.7,
+                ease: [0.16, 1, 0.3, 1],
+                delay: delay + wIdx * 0.15 + cIdx * 0.035,
+              }}
+              className="inline-block"
+            >
+              {char}
+            </motion.span>
+          ))}
+        </span>
+      ))}
+    </span>
+  );
+}
+
 // ─── Magnetic Button Props & Logic ─────────────────────────
 interface HeroMagneticBtnProps {
   onClick?: () => void;
@@ -469,12 +498,13 @@ function HeroMagneticBtn({ onClick, children, primary }: HeroMagneticBtnProps) {
   const ref = useRef<HTMLButtonElement | null>(null);
 
   const onMove = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    if (typeof window !== "undefined" && window.innerWidth < 1024) return;
     const el = ref.current;
     if (!el) return;
     const r = el.getBoundingClientRect();
-    const x = (e.clientX - r.left - r.width / 2) * 0.18;
-    const y = (e.clientY - r.top  - r.height / 2) * 0.18;
-    el.style.transform = `translate3d(${x}px,${y}px,0) scale(1.02)`;
+    const x = (e.clientX - r.left - r.width / 2) * 0.15;
+    const y = (e.clientY - r.top  - r.height / 2) * 0.15;
+    el.style.transform = `translate3d(${x}px,${y}px,0) scale(1.025)`;
   }, []);
 
   const onLeave = useCallback(() => {
@@ -497,10 +527,10 @@ function HeroMagneticBtn({ onClick, children, primary }: HeroMagneticBtnProps) {
       onMouseEnter={onEnter}
       onMouseLeave={onLeave}
       onClick={onClick}
-      className={`group relative px-7 py-4 rounded-full font-mono text-[9px] uppercase tracking-widest transition-all duration-300 flex items-center justify-center cursor-pointer select-none active:scale-95 border ${
+      className={`group relative px-6 py-3.5 sm:px-8 sm:py-4.5 rounded-full font-mono text-[11px] uppercase tracking-[0.22em] transition-all duration-300 flex items-center justify-center cursor-pointer select-none active:scale-95 border ${
         primary
-          ? "bg-slate-900 text-white border-transparent shadow-lg dark:bg-white dark:text-slate-950 font-bold"
-          : "bg-transparent text-foreground border-black/10 dark:border-white/10 hover:border-blue-500/50 hover:bg-black/5 dark:hover:bg-white/5"
+          ? "bg-slate-900 text-white border-transparent shadow-[0_4px_25px_rgba(59,130,246,0.25)] dark:bg-white dark:text-slate-950 dark:shadow-[0_4px_25px_rgba(255,255,255,0.1)] font-extrabold hover:shadow-[0_4px_35px_rgba(59,130,246,0.4)]"
+          : "bg-transparent text-foreground border-black/15 dark:border-white/15 hover:border-blue-500/40 hover:bg-black/5 dark:hover:bg-white/5"
       }`}
       style={{ willChange: "transform" }}
     >
@@ -509,17 +539,305 @@ function HeroMagneticBtn({ onClick, children, primary }: HeroMagneticBtnProps) {
   );
 }
 
-// ─── Luxurious Apple-Style Hero (Google AI Wave Mesh Background) ──
+// ─── Modern Code-Wrapped Developer Name Component ────────────
+function ModernDevelopmentName({ lang }: { lang: Lang }) {
+  return (
+    <div className="tracking-tight leading-[1.0] mb-6 select-none text-left">
+      <div className="flex items-center gap-2 mb-3.5">
+        <span className="text-slate-500 dark:text-slate-400 text-[10px] font-mono uppercase tracking-[0.25em] font-bold">
+          {lang === "en" ? "System Core // Developer" : "Noyau Système // Développeur"}
+        </span>
+        <span className="h-px w-10 bg-slate-350 dark:bg-white/10" />
+      </div>
+      <div className="flex flex-wrap items-baseline gap-x-1.5 sm:gap-x-2 text-[24px] xs:text-[32px] sm:text-5xl md:text-6xl lg:text-6.5xl font-black font-display text-slate-900 dark:text-white leading-[1.1]">
+        <span className="text-blue-500 font-mono text-xl sm:text-3.5xl md:text-4.5xl select-none">&lt;</span>
+        <span className="inline-block relative">
+          <StaggerText text="Younes Bakkali Terghi" delay={0.2} />
+        </span>
+        <span className="text-blue-500 font-mono text-xl sm:text-3.5xl md:text-4.5xl select-none">/&gt;</span>
+      </div>
+    </div>
+  );
+}
+
+// ─── Mobile Typewriter Effect ─────────────────────────────
+function MobileTypewriter({ words }: { words: string[] }) {
+  const [index, setIndex] = useState(0);
+  const [subIndex, setSubIndex] = useState(0);
+  const [reverse, setReverse] = useState(false);
+  const [blink, setBlink] = useState(true);
+
+  useEffect(() => {
+    const timer = setInterval(() => setBlink((b) => !b), 500);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    if (subIndex === words[index].length + 1 && !reverse) {
+      const timeout = setTimeout(() => setReverse(true), 1500);
+      return () => clearTimeout(timeout);
+    }
+
+    if (subIndex === 0 && reverse) {
+      setReverse(false);
+      setIndex((prev) => (prev + 1) % words.length);
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      setSubIndex((prev) => prev + (reverse ? -1 : 1));
+    }, reverse ? 40 : 80);
+
+    return () => clearTimeout(timeout);
+  }, [subIndex, reverse, index, words]);
+
+  return (
+    <span className="font-mono text-cyan-400 dark:text-cyan-400 font-extrabold text-[11px] sm:text-xs">
+      {words[index].substring(0, subIndex)}
+      <span className={`inline-block w-1.5 h-3 bg-cyan-400 ml-0.5 ${blink ? "opacity-100" : "opacity-0"}`} />
+    </span>
+  );
+}
+
+// ─── Cyber-Futuristic Mobile-Only Hero Layout ─────────────
+function MobileHeroSection({ lang, onNavigate }: { lang: Lang; onNavigate: (id: string) => void }) {
+  const t = T[lang];
+  const typewriterWords = lang === "en"
+    ? ["Software Engineer", "Full Stack Developer", "Networks & Systems Specialist", "EMSI Majorant (1st)"]
+    : ["Ingénieur Logiciel", "Développeur Full Stack", "Spécialiste Systèmes & Réseaux", "Major de Promotion EMSI"];
+
+  const [hudStatus, setHudStatus] = useState("CONNECTING...");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setHudStatus("SYS_ACTIVE_OK");
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <section id="hero" className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-[#030303] text-white px-4 py-20 select-none font-mono">
+      {/* Wave mesh backdrop */}
+      <GeminiWaveMesh />
+
+      {/* 3D Visual background integrated inside mobile Hero */}
+      <div className="absolute inset-0 z-0 opacity-80 pointer-events-none">
+        <InteractiveScene3D />
+      </div>
+
+      {/* HUD Telemetry Grid Overlay */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(59,130,246,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(59,130,246,0.02)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none z-[1]" />
+      
+      {/* HUD Scanline overlay */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0)_98%,rgba(59,130,246,0.04)_98%)] bg-[size:100%_6px] pointer-events-none z-[1]" />
+
+      {/* Futuristic Corner Brackets */}
+      <div className="absolute top-24 left-4 w-4 h-4 border-t border-l border-blue-500/35 pointer-events-none z-10" />
+      <div className="absolute top-24 right-4 w-4 h-4 border-t border-r border-blue-500/35 pointer-events-none z-10" />
+      <div className="absolute bottom-20 left-4 w-4 h-4 border-b border-l border-blue-500/35 pointer-events-none z-10" />
+      <div className="absolute bottom-20 right-4 w-4 h-4 border-b border-r border-blue-500/35 pointer-events-none z-10" />
+
+      {/* Top Left Telemetry */}
+      <motion.div 
+        initial={{ opacity: 0, x: -10 }}
+        animate={{ opacity: 0.8, x: 0 }}
+        transition={{ duration: 1, delay: 0.1 }}
+        className="absolute top-24 left-6 flex flex-col text-[7.5px] tracking-widest text-slate-400 gap-0.5 z-10"
+      >
+        <div className="flex items-center gap-1">
+          <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
+          <span>SYS_APERTURE_v4.6</span>
+        </div>
+        <div className="opacity-60">LINK_SECURE: OK</div>
+      </motion.div>
+
+      {/* Top Right Telemetry */}
+      <motion.div 
+        initial={{ opacity: 0, x: 10 }}
+        animate={{ opacity: 0.8, x: 0 }}
+        transition={{ duration: 1, delay: 0.1 }}
+        className="absolute top-24 right-6 flex flex-col items-end text-[7.5px] tracking-widest text-slate-400 gap-0.5 z-10"
+      >
+        <div>LAT: 34.02° N</div>
+        <div className="opacity-60">LON: 6.83° W</div>
+      </motion.div>
+
+      {/* Bottom Left Telemetry */}
+      <motion.div 
+        initial={{ opacity: 0, x: -10 }}
+        animate={{ opacity: 0.8, x: 0 }}
+        transition={{ duration: 1, delay: 0.3 }}
+        className="absolute bottom-20 left-6 flex flex-col text-[7.5px] tracking-widest text-slate-400 gap-0.5 z-10"
+      >
+        <div>TEMP: 32.4°C</div>
+        <div className="opacity-60">NET: 10Gb/s</div>
+      </motion.div>
+
+      {/* Bottom Right Telemetry */}
+      <motion.div 
+        initial={{ opacity: 0, x: 10 }}
+        animate={{ opacity: 0.8, x: 0 }}
+        transition={{ duration: 1, delay: 0.3 }}
+        className="absolute bottom-20 right-6 flex flex-col items-end text-[7.5px] tracking-widest text-slate-400 gap-0.5 z-10"
+      >
+        <div className="flex items-center gap-1">
+          <span>HUD:</span>
+          <span className="text-cyan-400 font-bold">{hudStatus}</span>
+        </div>
+        <div className="opacity-60">PORTAL: ACTIVE</div>
+      </motion.div>
+
+      {/* Central HUD Panel Content */}
+      <div className="flex flex-col items-center justify-center w-full max-w-sm mt-12 px-2 z-10 gap-6">
+        
+        {/* 1. Cyber Identity/Biometric Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+          className="relative py-5 px-6 w-full max-w-[340px] flex flex-col items-center bg-[#07070a]/85 backdrop-blur-md border border-blue-500/20 rounded-2xl shadow-[0_0_30px_rgba(0,0,0,0.6)]"
+        >
+          {/* Card border accents */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-blue-600/90 text-[7px] font-mono tracking-[0.25em] text-white px-2.5 py-0.5 rounded font-extrabold uppercase">
+            IDENTITY_LOCK
+          </div>
+          
+          {/* Crosshairs decoration */}
+          <div className="absolute top-2.5 left-2.5 w-2 h-2 border-t border-l border-blue-400/40" />
+          <div className="absolute top-2.5 right-2.5 w-2 h-2 border-t border-r border-blue-400/40" />
+          <div className="absolute bottom-2.5 left-2.5 w-2 h-2 border-b border-l border-blue-400/40" />
+          <div className="absolute bottom-2.5 right-2.5 w-2 h-2 border-b border-r border-blue-400/40" />
+
+          {/* Availability Status Badge */}
+          <div className="mb-2 text-[8px] font-mono text-emerald-450 tracking-[0.2em] uppercase flex items-center gap-1.5 font-bold">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-450 opacity-75" />
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-450" />
+            </span>
+            {t.available}
+          </div>
+
+          {/* Name - Styled clear, white, bold and modern */}
+          <h1 className="text-[25px] xs:text-[28px] sm:text-[30px] font-black tracking-tight text-white text-center leading-tight font-sans drop-shadow-[0_2px_8px_rgba(255,255,255,0.2)]">
+            Younes Bakkali Terghi
+          </h1>
+
+          {/* Hierarchy sub-label */}
+          <div className="mt-2 text-[7.5px] font-mono tracking-[0.3em] text-slate-550 uppercase font-extrabold">
+            // EMSI CLASS MAJORANT
+          </div>
+        </motion.div>
+
+        {/* 2. Interactive Role Terminal Shell */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.45 }}
+          className="w-full max-w-[340px] bg-[#0c0c10]/95 border border-slate-800 rounded-xl p-3 flex flex-col font-mono text-[9.5px] text-slate-350 gap-1.5 shadow-[0_4px_25px_rgba(0,0,0,0.5)]"
+        >
+          <div className="flex justify-between border-b border-slate-800 pb-1.5 text-slate-550 font-extrabold select-none">
+            <span>// ROLES_SHELL</span>
+            <span>TTY1</span>
+          </div>
+          <div className="flex items-center gap-1.5 min-h-[16px] text-cyan-400 font-extrabold tracking-wide">
+            <span className="text-slate-550 font-black">&gt;</span>
+            <MobileTypewriter words={typewriterWords} />
+          </div>
+        </motion.div>
+
+        {/* 3. Modern Biography */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.85 }}
+          transition={{ duration: 1, delay: 0.65 }}
+          className="text-[10px] sm:text-[10.5px] leading-relaxed text-slate-400 max-w-[320px] text-center font-mono opacity-90 px-1"
+        >
+          {lang === "en"
+            ? "Architecting high-performance distributed systems, TinyML Edge computation nodes, and deep AI model integrations."
+            : "Spécialiste de la conception d'architectures distribuées, de l'IA embarquée et des services web haut de gamme."}
+        </motion.p>
+
+        {/* 4. Cyber Actions / Buttons Panel */}
+        <div className="flex flex-col gap-3 w-full max-w-[340px] mt-1">
+          
+          {/* Download CV */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 0.75 }}
+            className="w-full"
+          >
+            <a 
+              href="/CV_Younes_Bakkali_Terghi.pdf" 
+              download="CV_Younes_Bakkali_Terghi.pdf"
+              className="relative py-4 rounded-xl font-mono text-[8.5px] uppercase tracking-[0.2em] text-emerald-400 bg-emerald-500/[0.02] border border-emerald-500/25 hover:border-emerald-500/60 shadow-[0_0_15px_rgba(16,185,129,0.06)] flex items-center justify-center cursor-pointer select-none active:scale-[0.97] transition-all duration-300 w-full font-extrabold overflow-hidden group"
+            >
+              <span className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-out" />
+              <svg className="mr-2" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+              </svg>
+              {lang === "en" ? "INIT_CV_DOWNLOAD.sh" : "TELECHARGER_CV.pdf"}
+            </a>
+          </motion.div>
+
+          {/* Contact */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 0.85 }}
+            className="w-full"
+          >
+            <button 
+              onClick={() => onNavigate("contact")}
+              className="relative py-4 rounded-xl font-mono text-[8.5px] uppercase tracking-[0.2em] text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 border border-blue-400/30 shadow-[0_0_20px_rgba(59,130,246,0.22)] flex items-center justify-center cursor-pointer select-none active:scale-[0.97] transition-all duration-300 w-full font-extrabold"
+            >
+              {lang === "en" ? "CONNECT_PORTAL.lnk" : "ME_CONTACTER.cmd"}
+              <svg className="ml-2" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </button>
+          </motion.div>
+
+        </div>
+
+        {/* 5. Terminal Link Nodes */}
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.65 }}
+          transition={{ duration: 1, delay: 0.95 }}
+          className="flex justify-center gap-6 text-[7.5px] font-mono tracking-widest text-slate-400 mt-2 select-none"
+        >
+          <a href="https://github.com/bakk04" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-colors uppercase font-bold">[ GITHUB_NODE ]</a>
+          <a href="https://linkedin.com/in/younes-bakkali-terghi" target="_blank" rel="noopener noreferrer" className="hover:text-cyan-400 transition-colors uppercase font-bold">[ LINKEDIN_NODE ]</a>
+        </motion.div>
+
+      </div>
+    </section>
+  );
+}
+
 // ─── Luxurious Apple-Style Hero (Google AI Wave Mesh Background) ──
 function HeroSection({ lang, onNavigate }: { lang: Lang; onNavigate: (id: string) => void }) {
   const t = T[lang];
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    handleResize();
+    window.addEventListener("resize", handleResize, { passive: true });
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  if (isMobile) {
+    return <MobileHeroSection lang={lang} onNavigate={onNavigate} />;
+  }
 
   return (
     <section id="hero" className="relative min-h-screen flex items-center overflow-hidden">
       {/* Dynamic waving color mesh backdrop */}
       <GeminiWaveMesh />
 
-      <div className="max-w-6xl mx-auto px-6 md:px-8 w-full pt-32 pb-16 relative z-10">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 w-full pt-36 pb-16 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center text-left">
           
           {/* Left Text Column */}
@@ -529,7 +847,7 @@ function HeroSection({ lang, onNavigate }: { lang: Lang; onNavigate: (id: string
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-              className="mb-6 inline-flex items-center gap-2 px-4 py-2 rounded-full border text-[9px] uppercase tracking-wider font-mono font-bold bg-blue-500/[0.04] text-blue-600 dark:text-blue-400 border-blue-500/25 shadow-sm"
+              className="mb-6 inline-flex items-center gap-2.5 px-4.5 py-2 rounded-full border text-[9.5px] uppercase tracking-wider font-mono font-bold bg-blue-500/[0.04] text-blue-600 dark:text-blue-400 border-blue-500/25 shadow-sm"
             >
               <span className="relative flex h-1.5 w-1.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
@@ -538,24 +856,15 @@ function HeroSection({ lang, onNavigate }: { lang: Lang; onNavigate: (id: string
               {t.available}
             </motion.div>
 
-            {/* Large Name Display */}
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-              className="text-5xl sm:text-6xl md:text-7.5xl font-black font-display tracking-tight leading-[0.95] mb-6 select-none"
-            >
-              <span className="block text-slate-500 dark:text-slate-400 text-lg font-mono uppercase tracking-widest font-bold mb-3">{t.heroGreeting}</span>
-              <span className="block text-slate-900 dark:text-white">Younes Bakkali</span>
-              <span className="block gradient-text">Terghi</span>
-            </motion.h1>
+            {/* Code-Wrapped Name display */}
+            <ModernDevelopmentName lang={lang} />
 
             {/* Specialty Label - Professional subtitle */}
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.4 }}
-              className="text-xs sm:text-sm md:text-md font-bold font-mono tracking-wide mb-6 text-slate-800 dark:text-slate-200 select-none uppercase border-l-2 border-blue-500 pl-4 py-1"
+              transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 1.0 }}
+              className="text-xs sm:text-sm md:text-sm font-bold font-mono tracking-wider mb-6 text-slate-800 dark:text-slate-200 select-none uppercase border-l-2 border-blue-500 pl-4 py-1"
             >
               Software Engineer | Full Stack Developer | Networks & Systems Engineer
             </motion.p>
@@ -564,30 +873,61 @@ function HeroSection({ lang, onNavigate }: { lang: Lang; onNavigate: (id: string
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.5 }}
-              className="text-xs md:text-sm leading-relaxed opacity-75 text-muted-foreground font-body mb-8 select-none max-w-xl"
+              transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 1.15 }}
+              className="text-xs md:text-sm leading-relaxed opacity-85 text-muted-foreground font-body mb-8 select-none max-w-2xl"
             >
               {lang === "en"
-                ? "4th-Year Software Engineering Majorant (1st) at EMSI Rabat. Architecting high-performance web systems, TinyML Edge computation nodes, and deep AI model integrations."
-                : "Élève Ingénieur de 4ème Année & Major de Promotion (1er) à l'EMSI Rabat. Spécialiste du développement full-stack haut de gamme, de l'IA embarquée et des architectures distribuées."}
+                ? "4th-Year Software Engineering Majorant (1st of Prom) at EMSI Rabat. Architecting high-performance distributed systems, TinyML Edge computation nodes, and deep AI model integrations."
+                : "Élève Ingénieur de 4ème Année & Major de Promotion (1er) à l'EMSI Rabat. Spécialiste de la conception d'architectures distribuées, de l'IA embarquée et des services web haut de gamme."}
             </motion.p>
 
             {/* CTA Buttons */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.6 }}
+              transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 1.3 }}
               className="flex flex-wrap gap-4"
             >
+              {/* Projects CTA */}
               <HeroMagneticBtn onClick={() => onNavigate("projects")} primary>
                 {t.heroCta1}
-                <svg className="ml-2 transition-transform duration-200 group-hover:translate-x-0.5" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <svg className="ml-2 transition-transform duration-200 group-hover:translate-x-0.5" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M5 12h14M12 5l7 7-7 7"/>
                 </svg>
               </HeroMagneticBtn>
-              <HeroMagneticBtn onClick={() => onNavigate("contact")}>
+
+              {/* CV Download CTA */}
+              <a 
+                href="/CV_Younes_Bakkali_Terghi.pdf" 
+                download="CV_Younes_Bakkali_Terghi.pdf"
+                className="group relative px-5.5 py-3.5 sm:px-7 sm:py-4.5 rounded-full font-mono text-[11px] uppercase tracking-[0.22em] border border-[#10b981]/30 hover:border-[#10b981]/60 bg-transparent text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/5 transition-all duration-300 flex items-center justify-center cursor-pointer select-none active:scale-95 shadow-[0_0_15px_rgba(16,185,129,0.02)] hover:shadow-[0_0_20px_rgba(16,185,129,0.12)]"
+              >
+                <svg className="mr-2.5 group-hover:translate-y-0.5 transition-transform" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+                </svg>
+                {lang === "en" ? "Download CV" : "Télécharger CV"}
+              </a>
+
+              {/* GitHub Link CTA */}
+              <a 
+                href="https://github.com/bakk04" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="group relative px-5.5 py-3.5 sm:px-7 sm:py-4.5 rounded-full font-mono text-[11px] uppercase tracking-[0.22em] border border-black/15 dark:border-white/15 hover:border-blue-500/40 hover:bg-black/5 dark:hover:bg-white/5 text-foreground transition-all duration-300 flex items-center justify-center cursor-pointer select-none active:scale-95"
+              >
+                <svg className="mr-2.5 w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                  <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+                </svg>
+                GitHub
+              </a>
+
+              {/* Contact Me CTA */}
+              <button 
+                onClick={() => onNavigate("contact")}
+                className="group relative px-5.5 py-3.5 sm:px-7 sm:py-4.5 rounded-full font-mono text-[11px] uppercase tracking-[0.22em] border border-black/10 dark:border-white/10 hover:border-blue-500/40 bg-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all duration-300 flex items-center justify-center cursor-pointer select-none active:scale-95"
+              >
                 {t.heroCta2}
-              </HeroMagneticBtn>
+              </button>
             </motion.div>
           </div>
 
@@ -596,10 +936,10 @@ function HeroSection({ lang, onNavigate }: { lang: Lang; onNavigate: (id: string
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
+              transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1], delay: 0.35 }}
               className="w-full flex justify-center"
             >
-              <HeroVisual />
+              <InteractiveScene3D />
             </motion.div>
           </div>
 
@@ -660,7 +1000,7 @@ function AboutSection({ lang }: { lang: Lang }) {
             
             {/* Cell 1: Bio */}
             <div className="md:col-span-2">
-              <PerspectiveCard maxTilt={3} className="p-8 flex flex-col gap-5 h-full justify-center">
+              <PerspectiveCard maxTilt={3} className="p-5.5 sm:p-8 flex flex-col gap-5 h-full justify-center">
                 <h3 className="text-lg font-bold tracking-tight font-display leading-snug">
                   {lang === "en" 
                     ? "Designing robust server architectures and elegant intelligent frontends." 
@@ -677,7 +1017,7 @@ function AboutSection({ lang }: { lang: Lang }) {
 
             {/* Cell 2: Major de promotion */}
             <div>
-              <PerspectiveCard maxTilt={5} className="p-8 flex flex-col justify-between h-full bg-gradient-to-br from-blue-500/[0.03] to-transparent dark:from-blue-950/10">
+              <PerspectiveCard maxTilt={5} className="p-5.5 sm:p-8 flex flex-col justify-between h-full bg-gradient-to-br from-blue-500/[0.03] to-transparent dark:from-blue-950/10">
                 <Award className="w-6 h-6 text-blue-500 mb-8" />
                 <div>
                   <div className="text-5xl font-black text-blue-600 dark:text-blue-400 mb-1.5 tracking-tight font-display">
@@ -700,7 +1040,7 @@ function AboutSection({ lang }: { lang: Lang }) {
 
             {/* Cell 4: Numeric Stats */}
             <div className="grid grid-cols-2 gap-4">
-              <PerspectiveCard maxTilt={6} className="p-6 flex flex-col justify-between h-full bg-gradient-to-br from-emerald-500/[0.03] to-transparent dark:from-emerald-950/10">
+              <PerspectiveCard maxTilt={6} className="p-4.5 sm:p-6 flex flex-col justify-between h-full bg-gradient-to-br from-emerald-500/[0.03] to-transparent dark:from-emerald-950/10">
                 <span className="text-emerald-600 dark:text-emerald-400 text-[9px] font-mono font-bold tracking-wider">// PROJECTS</span>
                 <div>
                   <div className="text-4xl font-black text-emerald-600 dark:text-emerald-400 leading-none">10+</div>
@@ -708,7 +1048,7 @@ function AboutSection({ lang }: { lang: Lang }) {
                 </div>
               </PerspectiveCard>
               
-              <PerspectiveCard maxTilt={6} className="p-6 flex flex-col justify-between h-full bg-gradient-to-br from-cyan-500/[0.03] to-transparent dark:from-cyan-950/10">
+              <PerspectiveCard maxTilt={6} className="p-4.5 sm:p-6 flex flex-col justify-between h-full bg-gradient-to-br from-cyan-500/[0.03] to-transparent dark:from-cyan-950/10">
                 <span className="text-cyan-600 dark:text-cyan-400 text-[9px] font-mono font-bold tracking-wider">// STAGE</span>
                 <div>
                   <div className="text-4xl font-black text-cyan-600 dark:text-cyan-400 leading-none">1</div>
@@ -767,7 +1107,7 @@ function ProjectCard({
     <PerspectiveCard
       maxTilt={4}
       glareOpacity={0.08}
-      className="p-8 flex flex-col gap-5 h-full relative overflow-hidden group"
+      className="p-5.5 sm:p-8 flex flex-col gap-5 h-full relative overflow-hidden group"
     >
       {/* Hover glow */}
       <div
@@ -817,13 +1157,13 @@ function ProjectCard({
 
       {/* IoT Status block for AgroMind */}
       {proj.id === "agromind" && (
-        <div className="my-1 bg-[#09090b] border border-white/5 p-4 rounded-xl font-mono text-[8.5px] text-slate-400 flex justify-between items-center select-none relative z-20">
+        <div className="my-1 bg-[#09090b] border border-white/5 p-3.5 sm:p-4 rounded-xl font-mono text-[8.5px] text-slate-400 flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center select-none relative z-20">
           <div className="flex flex-col gap-1 text-left">
             <span className="text-emerald-400 font-bold">// ESP32 NODE STATUS</span>
             <span>SOIL_MOISTURE: 42.4%</span>
             <span>OUTFLOW: 0.12 L/s</span>
           </div>
-          <div className="flex flex-col items-end gap-1.5">
+          <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-1.5 w-full sm:w-auto border-t border-white/[0.04] sm:border-0 pt-2 sm:pt-0">
             <span className="px-2.5 py-0.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-[7.5px] text-emerald-400 font-bold">IRRIGATING: OFF</span>
             <span className="text-slate-500">SAVINGS: +25%</span>
           </div>
@@ -920,8 +1260,8 @@ function TimelineSection({ lang }: { lang: Lang }) {
                     <div
                       className={`flex-1 pl-8 md:pl-0 ${isLeft ? "md:pr-12" : "md:pl-12"} ${isLeft ? "md:text-right" : "md:text-left"}`}
                     >
-                      <PerspectiveCard maxTilt={4} className="p-6 inline-block w-full md:max-w-md">
-                        <div className="flex items-center gap-2 mb-2.5 justify-start md:justify-inherit">
+                      <PerspectiveCard maxTilt={4} className="p-5.5 sm:p-6 inline-block w-full md:max-w-md">
+                        <div className={`flex items-center gap-2 mb-2.5 ${isLeft ? "md:justify-end" : "md:justify-start"}`}>
                           <span
                             className="text-[8px] px-2.5 py-0.5 rounded-full border uppercase font-bold font-mono"
                             style={{
@@ -1040,112 +1380,201 @@ function ContactSection({ lang }: { lang: Lang }) {
   };
 
   return (
-    <section id="contact" className="py-24">
-      <div className="max-w-5xl mx-auto px-6 md:px-8">
+    <section id="contact" className="py-24 relative overflow-hidden">
+      <div className="max-w-6xl mx-auto px-6 md:px-8 relative z-10">
         <CinematicScrollReveal direction="up" intensity="cinematic">
           <div className="section-label mb-6">{t.contactLabel}</div>
-          <h2
-            className="mb-4 font-extrabold tracking-tight text-4xl sm:text-5xl font-display"
-            style={{ lineHeight: 1.15 }}
-          >
-            {t.contactTitle}
-          </h2>
-          <p className="text-xs mb-10 text-muted-foreground font-body">
-            {t.contactDesc}
-          </p>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start mt-4">
+            
+            {/* Left Column: Form */}
+            <div className="lg:col-span-7 flex flex-col gap-6">
+              <h2
+                className="font-extrabold tracking-tight text-3xl sm:text-4xl font-display text-slate-900 dark:text-white"
+                style={{ lineHeight: 1.15 }}
+              >
+                {t.contactTitle}
+              </h2>
+              <p className="text-xs.5 text-muted-foreground font-body leading-relaxed max-w-xl">
+                {t.contactDesc}
+              </p>
 
-          <div className="max-w-xl">
-            <AnimatePresence mode="wait">
-              {sent ? (
-                <div className="glass-card rounded-2xl p-8 flex flex-col items-center gap-4 text-center border border-primary/30 shadow-[0_0_20px_rgba(96,165,250,0.1)]">
-                  <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center mb-1 border animate-bounce"
-                    style={{ background: "rgba(96,165,250,0.08)", borderColor: "rgba(96,165,250,0.2)" }}
-                  >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="2.5">
-                      <polyline points="20 6 9 17 4 12"/>
-                    </svg>
-                  </div>
-                  <p className="font-bold text-[11px] tracking-wide font-mono text-foreground">
-                    {t.contactSent}
-                  </p>
+              <div className="w-full mt-4">
+                <AnimatePresence mode="wait">
+                  {sent ? (
+                    <div className="glass-card rounded-3xl p-8 flex flex-col items-center gap-4 text-center border border-emerald-500/20 bg-emerald-500/[0.02] shadow-[0_10px_30px_rgba(16,185,129,0.06)]">
+                      <div
+                        className="w-12 h-12 rounded-full flex items-center justify-center mb-1 border border-emerald-500/20 bg-emerald-500/10 text-emerald-500 animate-bounce"
+                      >
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                          <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                      </div>
+                      <p className="font-bold text-[12.5px] tracking-wide font-mono text-emerald-600 dark:text-emerald-400">
+                        {t.contactSent}
+                      </p>
+                    </div>
+                  ) : (
+                    <PerspectiveCard maxTilt={2} className="p-7 flex flex-col gap-5">
+                      <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+                        <div className="flex flex-col gap-2">
+                          <label className="text-[9px] uppercase font-bold tracking-[0.18em] text-slate-450 dark:text-slate-500 font-mono">
+                            {t.contactName}
+                          </label>
+                          <input
+                            required
+                            type="text"
+                            className="contact-input animate-none"
+                            placeholder="Younes Bakkali Terghi"
+                            value={form.name}
+                            onChange={(e) => setForm({ ...form, name: e.target.value })}
+                          />
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          <label className="text-[9px] uppercase font-bold tracking-[0.18em] text-slate-450 dark:text-slate-500 font-mono">
+                            {t.contactEmail}
+                          </label>
+                          <input
+                            required
+                            type="email"
+                            className="contact-input animate-none"
+                            placeholder="younessbakkali09@gmail.com"
+                            value={form.email}
+                            onChange={(e) => setForm({ ...form, email: e.target.value })}
+                          />
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          <label className="text-[9px] uppercase font-bold tracking-[0.18em] text-slate-450 dark:text-slate-500 font-mono">
+                            {t.contactMsg}
+                          </label>
+                          <textarea
+                            required
+                            rows={4}
+                            className="contact-input resize-none animate-none"
+                            placeholder="Tell me about your project..."
+                            value={form.message}
+                            onChange={(e) => setForm({ ...form, message: e.target.value })}
+                          />
+                        </div>
+                        <button
+                          type="submit"
+                          disabled={sending}
+                          className="btn-primary mt-2 h-11.5 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest flex items-center justify-center gap-2 cursor-pointer select-none"
+                          style={{
+                            background: "var(--primary)",
+                            color: "var(--primary-foreground)",
+                            opacity: sending ? 0.7 : 1,
+                            cursor: sending ? "wait" : "pointer",
+                          }}
+                        >
+                          {sending ? (
+                            <>
+                              <svg
+                                width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
+                                className="animate-spin"
+                              >
+                                <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                              </svg>
+                              Sending…
+                            </>
+                          ) : (
+                            <>
+                              {t.contactSend}
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                              </svg>
+                            </>
+                          )}
+                        </button>
+                      </form>
+                    </PerspectiveCard>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+
+            {/* Right Column: Contact info details */}
+            <div className="lg:col-span-5 flex flex-col gap-6 lg:pl-6 w-full h-full justify-center">
+              <PerspectiveCard maxTilt={3} className="p-5.5 sm:p-8 flex flex-col gap-6.5 bg-gradient-to-br from-blue-500/[0.02] to-transparent dark:from-blue-950/[0.05]">
+                
+                <div className="border-b border-black/[0.04] dark:border-white/[0.04] pb-4">
+                  <span className="text-[10px] font-mono tracking-widest text-blue-500 dark:text-blue-400 uppercase font-bold">
+                    // CONTACT_CHANNELS
+                  </span>
+                  <h3 className="text-xl font-bold font-display text-slate-800 dark:text-white mt-1">
+                    {lang === "en" ? "Direct Info" : "Coordonnées Directes"}
+                  </h3>
                 </div>
-              ) : (
-                <PerspectiveCard maxTilt={2} className="p-6 flex flex-col gap-4">
-                  <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                    <div className="flex flex-col gap-1.5">
-                      <label className="text-[8px] uppercase font-bold tracking-wider text-slate-450 font-mono">
-                        {t.contactName}
-                      </label>
-                      <input
-                        required
-                        type="text"
-                        className="contact-input animate-none"
-                        placeholder="Younes Bakkali"
-                        value={form.name}
-                        onChange={(e) => setForm({ ...form, name: e.target.value })}
-                      />
+
+                <div className="flex flex-col gap-5">
+                  {/* Phone */}
+                  <div className="flex items-start gap-4">
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center border border-black/5 dark:border-white/5 bg-slate-900/5 dark:bg-white/[0.02] text-blue-500 shrink-0">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                      </svg>
                     </div>
-                    <div className="flex flex-col gap-1.5">
-                      <label className="text-[8px] uppercase font-bold tracking-wider text-slate-450 font-mono">
-                        {t.contactEmail}
-                      </label>
-                      <input
-                        required
-                        type="email"
-                        className="contact-input animate-none"
-                        placeholder="younes@example.com"
-                        value={form.email}
-                        onChange={(e) => setForm({ ...form, email: e.target.value })}
-                      />
+                    <div className="text-left">
+                      <p className="text-[10px] font-mono font-bold tracking-wider text-slate-400 dark:text-slate-500 uppercase">// TELEPHONE</p>
+                      <a href="tel:+212628503265" className="text-[13px] font-bold text-slate-800 dark:text-slate-200 hover:text-blue-500 transition-colors font-body mt-0.5 block">+212 628503265</a>
                     </div>
-                    <div className="flex flex-col gap-1.5">
-                      <label className="text-[8px] uppercase font-bold tracking-wider text-slate-450 font-mono">
-                        {t.contactMsg}
-                      </label>
-                      <textarea
-                        required
-                        rows={4}
-                        className="contact-input resize-none animate-none"
-                        placeholder="Tell me about your project..."
-                        value={form.message}
-                        onChange={(e) => setForm({ ...form, message: e.target.value })}
-                      />
+                  </div>
+
+                  {/* Email */}
+                  <div className="flex items-start gap-4">
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center border border-black/5 dark:border-white/5 bg-slate-900/5 dark:bg-white/[0.02] text-blue-500 shrink-0">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+                      </svg>
                     </div>
-                    <button
-                      type="submit"
-                      disabled={sending}
-                      className="btn-primary mt-2 h-11 rounded-full text-[10px] font-mono font-bold uppercase tracking-widest flex items-center justify-center gap-2 cursor-pointer select-none"
-                      style={{
-                        background: "var(--primary)",
-                        color: "var(--primary-foreground)",
-                        opacity: sending ? 0.7 : 1,
-                        cursor: sending ? "wait" : "pointer",
-                      }}
-                    >
-                      {sending ? (
-                        <>
-                          <svg
-                            width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
-                            style={{ animation: "spin-slow 0.8s linear infinite" }}
-                          >
-                            <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
-                          </svg>
-                          Sending…
-                        </>
-                      ) : (
-                        <>
-                          {t.contactSend}
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                            <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
-                          </svg>
-                        </>
-                      )}
-                    </button>
-                  </form>
-                </PerspectiveCard>
-              )}
-            </AnimatePresence>
+                    <div className="text-left">
+                      <p className="text-[10px] font-mono font-bold tracking-wider text-slate-400 dark:text-slate-500 uppercase">// EMAIL_PORT</p>
+                      <a href="mailto:younessbakkali09@gmail.com" className="text-[13px] font-bold text-slate-800 dark:text-slate-200 hover:text-blue-500 transition-colors font-body mt-0.5 block break-all">younessbakkali09@gmail.com</a>
+                    </div>
+                  </div>
+
+                  {/* Location */}
+                  <div className="flex items-start gap-4">
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center border border-black/5 dark:border-white/5 bg-slate-900/5 dark:bg-white/[0.02] text-blue-500 shrink-0">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+                      </svg>
+                    </div>
+                    <div className="text-left">
+                      <p className="text-[10px] font-mono font-bold tracking-wider text-slate-400 dark:text-slate-500 uppercase">// LOCATION</p>
+                      <p className="text-[13px] font-bold text-slate-800 dark:text-slate-200 font-body mt-0.5">Rabat - Salé, Maroc</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border-t border-black/[0.04] dark:border-white/[0.04] pt-5.5 flex gap-4 justify-start">
+                  {/* Github profile */}
+                  <a 
+                    href="https://github.com/bakk04" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="w-9 h-9 rounded-xl border border-black/5 dark:border-white/5 bg-slate-900/5 dark:bg-white/[0.02] hover:bg-blue-500/10 hover:border-blue-500/30 text-slate-650 dark:text-slate-350 hover:text-blue-500 flex items-center justify-center transition-all shadow-sm active:scale-90"
+                  >
+                    <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                      <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                  </a>
+                  {/* LinkedIn Profile */}
+                  <a 
+                    href="https://linkedin.com/in/younes-bakkali-terghi" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="w-9 h-9 rounded-xl border border-black/5 dark:border-white/5 bg-slate-900/5 dark:bg-white/[0.02] hover:bg-blue-500/10 hover:border-blue-500/30 text-slate-650 dark:text-slate-350 hover:text-blue-500 flex items-center justify-center transition-all shadow-sm active:scale-90"
+                  >
+                    <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                      <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                    </svg>
+                  </a>
+                </div>
+
+              </PerspectiveCard>
+            </div>
+
           </div>
         </CinematicScrollReveal>
       </div>
@@ -1191,6 +1620,14 @@ function AiAssistant({ lang }: { lang: Lang }) {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [thinking, setThinking] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    handleResize();
+    window.addEventListener("resize", handleResize, { passive: true });
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     setMessages([
@@ -1236,7 +1673,7 @@ function AiAssistant({ lang }: { lang: Lang }) {
       ];
 
   return (
-    <div className="fixed bottom-6 right-6 z-[999] select-none">
+    <>
       <AskYounesAi
         lang={lang}
         isOpen={open}
@@ -1247,22 +1684,64 @@ function AiAssistant({ lang }: { lang: Lang }) {
         chips={chips}
       />
 
-      <button
-        onClick={() => setOpen(!open)}
-        className="w-11 h-11 rounded-full flex items-center justify-center border border-white/10 dark:border-white/5 bg-white/85 dark:bg-[#0d0d11]/85 hover:scale-105 active:scale-95 transition-all shadow-md backdrop-blur-md relative group cursor-pointer"
-      >
-        <span className="absolute inset-0 rounded-full bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-        
-        <span className="absolute top-1.5 right-1.5 flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500" />
-        </span>
+      <AnimatePresence>
+        {!open && (
+          <motion.div
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 400, damping: 28 }}
+            className="fixed bottom-6 right-6 z-[997] select-none"
+          >
+            {isMobile ? (
+              /* Custom Futuristic Mobile Floating Button */
+              <button
+                onClick={() => setOpen(true)}
+                className="w-13.5 h-13.5 rounded-full flex items-center justify-center border border-cyan-500/40 bg-[#030303]/80 backdrop-blur-md shadow-[0_0_20px_rgba(6,182,212,0.35)] relative active:scale-90 transition-transform cursor-pointer font-bold"
+              >
+                {/* Breathing ping rings */}
+                <span className="absolute -inset-1.5 rounded-full border border-cyan-400/25 scale-100 animate-ping" style={{ animationDuration: "2.5s" }} />
+                <span className="absolute -inset-3.5 rounded-full border border-blue-500/10 scale-95 animate-pulse" />
 
-        <MessageSquare
-          className="text-slate-700 dark:text-slate-300 group-hover:scale-110 transition-transform w-5 h-5"
-        />
-      </button>
-    </div>
+                {/* Small neon ping dot */}
+                <span className="absolute top-0.5 right-0.5 flex h-2.5 w-2.5 z-20">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-500" />
+                </span>
+
+                <div className="w-9 h-9 rounded-full flex items-center justify-center relative overflow-hidden shadow-inner">
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-cyan-400 to-indigo-600 animate-spin-slow scale-110" style={{ animationDuration: '7s' }} />
+                  <MessageSquare className="relative z-10 w-4 h-4 text-white" />
+                </div>
+              </button>
+            ) : (
+              /* Desktop Toggle Button (KEEP EXACTLY AS IS!) */
+              <button
+                onClick={() => setOpen(true)}
+                className="w-13.5 h-13.5 rounded-full flex items-center justify-center border border-blue-500/20 dark:border-white/10 bg-white dark:bg-[#07070a] hover:scale-105 active:scale-95 transition-all shadow-[0_8px_32px_rgba(59,130,246,0.22)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.65)] backdrop-blur-md relative group cursor-pointer"
+              >
+                {/* Breathing animated halos */}
+                <span className="absolute inset-0 rounded-full bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <span className="absolute -inset-2 rounded-full border border-blue-500/15 scale-100 group-hover:scale-110 opacity-70 group-hover:opacity-100 transition-all duration-700 animate-pulse" />
+                <span className="absolute -inset-3.5 rounded-full border border-cyan-500/10 scale-95 group-hover:scale-105 opacity-30 group-hover:opacity-50 transition-all duration-700 animate-pulse" style={{ animationDelay: "350ms" }} />
+
+                {/* Small neon ping dot */}
+                <span className="absolute top-0.5 right-0.5 flex h-2.5 w-2.5 z-20">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-500" />
+                </span>
+
+                {/* Outer rotating color ring */}
+                <div className="w-9 h-9 rounded-full flex items-center justify-center relative overflow-hidden shadow-inner">
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-cyan-400 to-indigo-600 animate-spin-slow scale-110" style={{ animationDuration: '9s' }} />
+                  <MessageSquare className="relative z-10 w-4 h-4 text-white group-hover:scale-110 transition-transform" />
+                </div>
+              </button>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
 
@@ -1283,15 +1762,18 @@ function PortfolioContent() {
     [lenis]
   );
 
-  if (loading) {
-    return <PreloaderModern onComplete={() => setLoading(false)} />;
-  }
-
   return (
-    <div
-      className="relative min-h-screen transition-colors duration-500"
-      style={{ background: "var(--background)", color: "var(--foreground)" }}
-    >
+    <>
+      <AnimatePresence>
+        {loading && (
+          <PreloaderModern onComplete={() => setLoading(false)} />
+        )}
+      </AnimatePresence>
+
+      <div
+        className="relative min-h-screen transition-colors duration-500"
+        style={{ background: "var(--background)", color: "var(--foreground)" }}
+      >
       <GlobalStyles />
       
       {/* Floating stardust grid */}
@@ -1317,7 +1799,9 @@ function PortfolioContent() {
       </main>
 
       <AiAssistant lang={lang} />
+      <BackToTopButton />
     </div>
+    </>
   );
 }
 

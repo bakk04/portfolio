@@ -369,4 +369,41 @@
   text-shadow: 0 0 12px rgba(96, 165, 250, 0.3);
 }
 
+/* ── Mobile-Only Premium Animations ──────────────────────── */
+@keyframes textShine {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+.animate-text-shine {
+  background: linear-gradient(
+    120deg,
+    #3b82f6 0%,
+    #06b6d4 25%,
+    #10b981 50%,
+    #06b6d4 75%,
+    #3b82f6 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textShine 6s linear infinite;
+}
+
+@keyframes shiningSweep {
+  0% { transform: translateX(-100%) skewX(-15deg); }
+  50%, 100% { transform: translateX(100%) skewX(-15deg); }
+}
+.animate-shining-sweep {
+  animation: shiningSweep 3.5s ease-in-out infinite;
+}
+
+@keyframes spinGlow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.animate-spin-glow {
+  animation: spinGlow 4s linear infinite;
+}
+
 
