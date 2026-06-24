@@ -1,0 +1,49 @@
+
+--- Page 1 ---
+YOUNES BAKKALI TERGHI
+Élève Ingénieur en Informatique | Full Stack Developer
+École Marocaine des Sciences de l'Ingénieur (EMSI) - 4ème année
+Rabat - Salé, Maroc  •  +212 628503265  •  younessbakkali09@gmail.com  • 
+linkedin.com/in/younes-bakkali-terghi  •  github.com/bakk04
+RÉSUMÉ
+Étudiant ingénieur et futur Full Stack Developer, doté d'excellentes capacités de résolution de problèmes, de communication
+et d'organisation. Passionné par l'intégration de l'Intelligence Artificielle et la conception d'architectures logicielles, je
+maîtrise aussi bien les technologies Back End que Front End. Habitué aux méthodologies Agile, je conçois des applications
+full-stack robustes et orientées performance.
+FORMATION
+Diplôme d'Ingénieur en Informatique et Systèmes d'Information 09/2024 – Présent
+EMSI (École Marocaine des Sciences de l'Ingénieur) | Rabat
+Classes Préparatoires Intégrées (Sciences de l'Ingénieur) 09/2022 – 06/2024
+EMSI | Rabat
+EXPÉRIENCE PROFESSIONNELLE
+Stagiaire Full Stack Developer & IA 07/2024 – 08/2024
+Beinterim | Salé, Maroc
+PROJETS TECHNIQUES
+AgroMind AI (IoT Agricole) 01/2026 – 05/2026
+Stack : React Native, Python, C++, MQTT, HiveMQ| github.com/bakk04/AgroMind
+Bricole.ma (Marketplace d'Artisans) 01/2026 – 04/2026
+Stack : Next.js, Javascript, Tailwind CSS | github.com/bakk04/Bricole.ma
+Sehati (Application PWA MedTech) 02/2026 – 06/2026
+Stack : Next.js, Capacitor, Modèles SSM (rPPG)
+COMPÉTENCES TECHNIQUES
+Back End & Langages : Java, Python, C++, ASP.NET, Ruby, Spring Boot, Django, Node.js, API REST
+Front End & Web Design : HTML, Javascript, Next.js, React.js, Tailwind CSS
+Bases de données : Oracle, SQL Server, PostgreSQL, MySQL
+Soft Skills & Outils : Résolution de problèmes, Sens de l'organisation, Communication, Agile/Scrum, Git, Docker
+CERTIFICATIONS
+Python Data Science Coursera
+React Native & Android Native Coursera
+Méthodologies Agile / Scrum Certifié
+Programmation C++ EPFL
+LANGUES
+Français Courant (B2)
+Anglais Technique (Lecture/Doc)
+Arabe Maternelle
+Niveau actuel : 4ème année d'ingénierie (équivalent Master).■
+Développement d'une plateforme full-stack réduisant le temps de tri des candidatures de 40%.■
+Intégration d'un modèle ML (Parsing CV) atteignant une précision d'extraction de 85%.■
+Architecture backend et API REST n'ayant connu aucune interruption de service durant la période de stage.■
+Création d'un système IoT réduisant la consommation d'eau de 25% par Edge Computing.■
+App mobile React Native et backend C++ communicant en temps réel via MQTT.■
+Création d'une application de mise en relation capable de gérer une base de plus de 500 artisans en temps réel.■
+Développement d'une PWA santé exécutant des modèles de vision par ordinateur avec une inférence locale de 60 FPS.■
