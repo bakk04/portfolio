@@ -192,9 +192,9 @@ export function AskYounesAi({
               
               <button
                 onClick={onClose}
-                className="w-7.5 h-7.5 rounded-full border border-black/[0.06] dark:border-white/10 flex items-center justify-center bg-white/70 dark:bg-white/[0.04] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:border-blue-500/30 hover:bg-blue-500/5 transition-all cursor-pointer shadow-sm active:scale-95"
+                className="w-8 h-8 rounded-full border border-slate-200 dark:border-white/10 flex items-center justify-center bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.04] dark:hover:bg-white/[0.1] text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all cursor-pointer shadow-sm active:scale-95 z-20"
               >
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <line x1="18" y1="6" x2="6" y2="18" />
                   <line x1="6" y1="6" x2="18" y2="18" />
                 </svg>

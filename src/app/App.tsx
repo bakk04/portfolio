@@ -592,9 +592,9 @@ function MobileTypewriter({ words }: { words: string[] }) {
   }, [subIndex, reverse, index, words]);
 
   return (
-    <span className="font-mono text-cyan-400 dark:text-cyan-400 font-extrabold text-[11px] sm:text-xs">
+    <span className="font-mono text-cyan-600 dark:text-cyan-400 font-extrabold text-[11px] sm:text-xs">
       {words[index].substring(0, subIndex)}
-      <span className={`inline-block w-1.5 h-3 bg-cyan-400 ml-0.5 ${blink ? "opacity-100" : "opacity-0"}`} />
+      <span className={`inline-block w-1.5 h-3 bg-cyan-600 dark:bg-cyan-400 ml-0.5 ${blink ? "opacity-100" : "opacity-0"}`} />
     </span>
   );
 }
@@ -606,193 +606,136 @@ function MobileHeroSection({ lang, onNavigate }: { lang: Lang; onNavigate: (id: 
     ? ["Software Engineer", "Full Stack Developer", "Networks & Systems Specialist", "EMSI Majorant (1st)"]
     : ["Ingénieur Logiciel", "Développeur Full Stack", "Spécialiste Systèmes & Réseaux", "Major de Promotion EMSI"];
 
-  const [hudStatus, setHudStatus] = useState("CONNECTING...");
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setHudStatus("SYS_ACTIVE_OK");
-    }, 1200);
-    return () => clearTimeout(timer);
-  }, []);
-
   return (
-    <section id="hero" className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-[#030303] text-white px-4 py-20 select-none font-mono">
-      {/* Wave mesh backdrop */}
-      <GeminiWaveMesh />
-
-      {/* 3D Visual background integrated inside mobile Hero */}
-      <div className="absolute inset-0 z-0 opacity-80 pointer-events-none">
+    <section id="hero" className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-background text-foreground px-6 py-20 select-none transition-colors duration-500">
+      {/* 3D Visual on Mobile (Interactive Rotating Globe Background) */}
+      <div className="absolute inset-0 z-0 pointer-events-none flex items-center justify-center overflow-hidden opacity-65 dark:opacity-40">
         <InteractiveScene3D />
       </div>
 
-      {/* HUD Telemetry Grid Overlay */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(59,130,246,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(59,130,246,0.02)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none z-[1]" />
-      
-      {/* HUD Scanline overlay */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0)_98%,rgba(59,130,246,0.04)_98%)] bg-[size:100%_6px] pointer-events-none z-[1]" />
+      {/* Slow-drifting GPU-accelerated CSS Auroras (highly visible, comfortable, and modern) */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-[1] opacity-25 dark:opacity-30">
+        <div 
+          className="absolute w-[80vw] h-[80vw] rounded-full top-[-20%] left-[-20%] bg-gradient-to-br from-blue-600/20 via-cyan-500/10 to-transparent blur-[100px] animate-pulse" 
+          style={{ animationDuration: "10s" }} 
+        />
+        <div 
+          className="absolute w-[70vw] h-[70vw] rounded-full bottom-[-10%] right-[-10%] bg-gradient-to-tr from-emerald-500/15 via-blue-600/5 to-transparent blur-[100px] animate-pulse" 
+          style={{ animationDuration: "14s" }} 
+        />
+      </div>
 
-      {/* Futuristic Corner Brackets */}
-      <div className="absolute top-24 left-4 w-4 h-4 border-t border-l border-blue-500/35 pointer-events-none z-10" />
-      <div className="absolute top-24 right-4 w-4 h-4 border-t border-r border-blue-500/35 pointer-events-none z-10" />
-      <div className="absolute bottom-20 left-4 w-4 h-4 border-b border-l border-blue-500/35 pointer-events-none z-10" />
-      <div className="absolute bottom-20 right-4 w-4 h-4 border-b border-r border-blue-500/35 pointer-events-none z-10" />
+      {/* Ambient vignette behind text to ensure 100% contrast and readability */}
+      <div className="absolute inset-0 bg-radial-gradient from-transparent via-background/40 to-background/90 z-[2] pointer-events-none transition-colors duration-500" />
 
-      {/* Top Left Telemetry */}
-      <motion.div 
-        initial={{ opacity: 0, x: -10 }}
-        animate={{ opacity: 0.8, x: 0 }}
-        transition={{ duration: 1, delay: 0.1 }}
-        className="absolute top-24 left-6 flex flex-col text-[7.5px] tracking-widest text-slate-400 gap-0.5 z-10"
-      >
-        <div className="flex items-center gap-1">
-          <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
-          <span>SYS_APERTURE_v4.6</span>
-        </div>
-        <div className="opacity-60">LINK_SECURE: OK</div>
-      </motion.div>
-
-      {/* Top Right Telemetry */}
-      <motion.div 
-        initial={{ opacity: 0, x: 10 }}
-        animate={{ opacity: 0.8, x: 0 }}
-        transition={{ duration: 1, delay: 0.1 }}
-        className="absolute top-24 right-6 flex flex-col items-end text-[7.5px] tracking-widest text-slate-400 gap-0.5 z-10"
-      >
-        <div>LAT: 34.02° N</div>
-        <div className="opacity-60">LON: 6.83° W</div>
-      </motion.div>
-
-      {/* Bottom Left Telemetry */}
-      <motion.div 
-        initial={{ opacity: 0, x: -10 }}
-        animate={{ opacity: 0.8, x: 0 }}
-        transition={{ duration: 1, delay: 0.3 }}
-        className="absolute bottom-20 left-6 flex flex-col text-[7.5px] tracking-widest text-slate-400 gap-0.5 z-10"
-      >
-        <div>TEMP: 32.4°C</div>
-        <div className="opacity-60">NET: 10Gb/s</div>
-      </motion.div>
-
-      {/* Bottom Right Telemetry */}
-      <motion.div 
-        initial={{ opacity: 0, x: 10 }}
-        animate={{ opacity: 0.8, x: 0 }}
-        transition={{ duration: 1, delay: 0.3 }}
-        className="absolute bottom-20 right-6 flex flex-col items-end text-[7.5px] tracking-widest text-slate-400 gap-0.5 z-10"
-      >
-        <div className="flex items-center gap-1">
-          <span>HUD:</span>
-          <span className="text-cyan-400 font-bold">{hudStatus}</span>
-        </div>
-        <div className="opacity-60">PORTAL: ACTIVE</div>
-      </motion.div>
-
-      {/* Central HUD Panel Content */}
-      <div className="flex flex-col items-center justify-center w-full max-w-sm mt-12 px-2 z-10 gap-6">
+      {/* Spacious, Comfortable Content Panel */}
+      <div className="w-full max-w-sm flex flex-col items-center text-center relative z-10 gap-8 mt-8">
         
-        {/* 1. Cyber Identity/Biometric Card */}
+        {/* Minimalist Available Badge */}
         <motion.div
-          initial={{ opacity: 0, y: 20, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-          className="relative py-5 px-6 w-full max-w-[340px] flex flex-col items-center bg-[#07070a]/85 backdrop-blur-md border border-blue-500/20 rounded-2xl shadow-[0_0_30px_rgba(0,0,0,0.6)]"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/[0.03] text-[9px] uppercase tracking-widest font-mono text-emerald-650 dark:text-emerald-450 font-bold"
         >
-          {/* Card border accents */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-blue-600/90 text-[7px] font-mono tracking-[0.25em] text-white px-2.5 py-0.5 rounded font-extrabold uppercase">
-            IDENTITY_LOCK
-          </div>
-          
-          {/* Crosshairs decoration */}
-          <div className="absolute top-2.5 left-2.5 w-2 h-2 border-t border-l border-blue-400/40" />
-          <div className="absolute top-2.5 right-2.5 w-2 h-2 border-t border-r border-blue-400/40" />
-          <div className="absolute bottom-2.5 left-2.5 w-2 h-2 border-b border-l border-blue-400/40" />
-          <div className="absolute bottom-2.5 right-2.5 w-2 h-2 border-b border-r border-blue-400/40" />
-
-          {/* Availability Status Badge */}
-          <div className="mb-2 text-[8px] font-mono text-emerald-450 tracking-[0.2em] uppercase flex items-center gap-1.5 font-bold">
-            <span className="relative flex h-1.5 w-1.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-450 opacity-75" />
-              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-450" />
-            </span>
-            {t.available}
-          </div>
-
-          {/* Name - Styled clear, white, bold and modern */}
-          <h1 className="text-[25px] xs:text-[28px] sm:text-[30px] font-black tracking-tight text-white text-center leading-tight font-sans drop-shadow-[0_2px_8px_rgba(255,255,255,0.2)]">
-            Younes Bakkali Terghi
-          </h1>
-
-          {/* Hierarchy sub-label */}
-          <div className="mt-2 text-[7.5px] font-mono tracking-[0.3em] text-slate-550 uppercase font-extrabold">
-            // EMSI CLASS MAJORANT
-          </div>
+          <span className="relative flex h-1.5 w-1.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400" />
+          </span>
+          {t.available}
         </motion.div>
 
-        {/* 2. Interactive Role Terminal Shell */}
+        {/* Developer Title Block */}
+        <div className="flex flex-col items-center gap-2 w-full">
+          <motion.span 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.5 }}
+            transition={{ duration: 1, delay: 0.1 }}
+            className="text-[9px] font-mono tracking-[0.3em] uppercase text-slate-500 dark:text-slate-400 font-semibold"
+          >
+            {lang === "en" ? "// CORE PROTOCOL" : "// SYSTEME"}
+          </motion.span>
+          
+          {/* Main Developer Name - Styled clean, bold, theme-responsive */}
+          <motion.h1 
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+            className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight font-sans drop-shadow-[0_2px_10px_rgba(0,0,0,0.05)] dark:drop-shadow-[0_2px_10px_rgba(255,255,255,0.15)] w-full"
+          >
+            Younes Bakkali Terghi
+          </motion.h1>
+
+          {/* Majorant Sub-label */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.8 }}
+            transition={{ duration: 1, delay: 0.35 }}
+            className="text-[9px] font-mono tracking-[0.25em] text-cyan-600 dark:text-cyan-400 font-bold uppercase mt-1"
+          >
+            {lang === "en" ? "EMSI Rank 1 Majorant" : "Major de Promo EMSI (1er)"}
+          </motion.div>
+        </div>
+
+        {/* Roles Terminal Line - Streamlined & Minimalist */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.45 }}
-          className="w-full max-w-[340px] bg-[#0c0c10]/95 border border-slate-800 rounded-xl p-3 flex flex-col font-mono text-[9.5px] text-slate-350 gap-1.5 shadow-[0_4px_25px_rgba(0,0,0,0.5)]"
+          className="flex items-center justify-center font-mono text-[11px] gap-2 py-1 px-4 border border-slate-200 dark:border-white/5 bg-slate-500/[0.03] dark:bg-white/[0.02] backdrop-blur-md rounded-full text-slate-700 dark:text-slate-300 font-semibold shadow-sm"
         >
-          <div className="flex justify-between border-b border-slate-800 pb-1.5 text-slate-550 font-extrabold select-none">
-            <span>// ROLES_SHELL</span>
-            <span>TTY1</span>
-          </div>
-          <div className="flex items-center gap-1.5 min-h-[16px] text-cyan-400 font-extrabold tracking-wide">
-            <span className="text-slate-550 font-black">&gt;</span>
-            <MobileTypewriter words={typewriterWords} />
-          </div>
+          <span className="text-slate-400 dark:text-slate-500 font-black">&gt;</span>
+          <MobileTypewriter words={typewriterWords} />
         </motion.div>
 
-        {/* 3. Modern Biography */}
+        {/* Biography Block - Highly readable font */}
         <motion.p
           initial={{ opacity: 0 }}
-          animate={{ opacity: 0.85 }}
-          transition={{ duration: 1, delay: 0.65 }}
-          className="text-[10px] sm:text-[10.5px] leading-relaxed text-slate-400 max-w-[320px] text-center font-mono opacity-90 px-1"
+          animate={{ opacity: 0.8 }}
+          transition={{ duration: 1, delay: 0.6 }}
+          className="text-[12.5px] leading-relaxed text-slate-600 dark:text-slate-400 font-sans max-w-[310px] select-text"
         >
           {lang === "en"
             ? "Architecting high-performance distributed systems, TinyML Edge computation nodes, and deep AI model integrations."
             : "Spécialiste de la conception d'architectures distribuées, de l'IA embarquée et des services web haut de gamme."}
         </motion.p>
 
-        {/* 4. Cyber Actions / Buttons Panel */}
-        <div className="flex flex-col gap-3 w-full max-w-[340px] mt-1">
+        {/* Premium CTA Buttons Group */}
+        <div className="flex flex-col gap-3 w-full max-w-[300px] mt-2">
           
           {/* Download CV */}
           <motion.div
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.75 }}
+            transition={{ duration: 0.8, delay: 0.7 }}
             className="w-full"
           >
             <a 
               href="/CV_Younes_Bakkali_Terghi.pdf" 
               download="CV_Younes_Bakkali_Terghi.pdf"
-              className="relative py-4 rounded-xl font-mono text-[8.5px] uppercase tracking-[0.2em] text-emerald-400 bg-emerald-500/[0.02] border border-emerald-500/25 hover:border-emerald-500/60 shadow-[0_0_15px_rgba(16,185,129,0.06)] flex items-center justify-center cursor-pointer select-none active:scale-[0.97] transition-all duration-300 w-full font-extrabold overflow-hidden group"
+              className="relative py-4 rounded-2xl font-sans text-xs tracking-wider text-emerald-600 dark:text-emerald-450 bg-emerald-500/[0.02] dark:bg-emerald-500/[0.03] border border-emerald-500/30 dark:border-emerald-500/20 hover:border-emerald-500/50 shadow-sm flex items-center justify-center cursor-pointer select-none active:scale-[0.98] transition-all duration-300 w-full font-bold overflow-hidden group"
             >
-              <span className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-out" />
-              <svg className="mr-2" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <span className="absolute inset-0 bg-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <svg className="mr-2.5 transition-transform duration-300 group-hover:translate-y-0.5 text-emerald-600 dark:text-emerald-400" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
               </svg>
-              {lang === "en" ? "INIT_CV_DOWNLOAD.sh" : "TELECHARGER_CV.pdf"}
+              {lang === "en" ? "Download CV" : "Télécharger le CV"}
             </a>
           </motion.div>
 
           {/* Contact */}
           <motion.div
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.85 }}
+            transition={{ duration: 0.8, delay: 0.8 }}
             className="w-full"
           >
             <button 
               onClick={() => onNavigate("contact")}
-              className="relative py-4 rounded-xl font-mono text-[8.5px] uppercase tracking-[0.2em] text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 border border-blue-400/30 shadow-[0_0_20px_rgba(59,130,246,0.22)] flex items-center justify-center cursor-pointer select-none active:scale-[0.97] transition-all duration-300 w-full font-extrabold"
+              className="relative py-4 rounded-2xl font-sans text-xs tracking-wider text-white bg-gradient-to-r from-blue-600 to-cyan-500 border border-blue-400/20 shadow-md flex items-center justify-center cursor-pointer select-none active:scale-[0.98] transition-all duration-300 w-full font-bold group"
             >
-              {lang === "en" ? "CONNECT_PORTAL.lnk" : "ME_CONTACTER.cmd"}
-              <svg className="ml-2" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              {lang === "en" ? "Let's Connect" : "Me Contacter"}
+              <svg className="ml-2.5 transition-transform duration-300 group-hover:translate-x-0.5" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path d="M5 12h14M12 5l7 7-7 7"/>
               </svg>
             </button>
@@ -800,15 +743,16 @@ function MobileHeroSection({ lang, onNavigate }: { lang: Lang; onNavigate: (id: 
 
         </div>
 
-        {/* 5. Terminal Link Nodes */}
+        {/* Minimal Social Links */}
         <motion.div 
           initial={{ opacity: 0 }}
-          animate={{ opacity: 0.65 }}
-          transition={{ duration: 1, delay: 0.95 }}
-          className="flex justify-center gap-6 text-[7.5px] font-mono tracking-widest text-slate-400 mt-2 select-none"
+          animate={{ opacity: 0.5 }}
+          transition={{ duration: 1, delay: 0.9 }}
+          className="flex justify-center gap-6 text-[10px] font-mono tracking-widest text-slate-500 dark:text-slate-400 mt-2 select-none"
         >
-          <a href="https://github.com/bakk04" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-colors uppercase font-bold">[ GITHUB_NODE ]</a>
-          <a href="https://linkedin.com/in/younes-bakkali-terghi" target="_blank" rel="noopener noreferrer" className="hover:text-cyan-400 transition-colors uppercase font-bold">[ LINKEDIN_NODE ]</a>
+          <a href="https://github.com/bakk04" target="_blank" rel="noopener noreferrer" className="hover:text-slate-900 dark:hover:text-white transition-colors">GITHUB</a>
+          <span>•</span>
+          <a href="https://linkedin.com/in/younes-bakkali-terghi" target="_blank" rel="noopener noreferrer" className="hover:text-slate-900 dark:hover:text-white transition-colors">LINKEDIN</a>
         </motion.div>
 
       </div>
@@ -1684,63 +1628,65 @@ function AiAssistant({ lang }: { lang: Lang }) {
         chips={chips}
       />
 
-      <AnimatePresence>
-        {!open && (
-          <motion.div
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 400, damping: 28 }}
-            className="fixed bottom-6 right-6 z-[997] select-none"
+      <div className="fixed bottom-6 right-6 z-[997] select-none">
+        {isMobile ? (
+          /* Custom Futuristic Mobile Floating Button */
+          <button
+            onClick={() => setOpen(!open)}
+            className="w-14 h-14 rounded-full flex items-center justify-center border border-cyan-500/40 bg-[#030303]/80 backdrop-blur-md shadow-[0_0_20px_rgba(6,182,212,0.35)] relative active:scale-90 transition-transform cursor-pointer font-bold"
           >
-            {isMobile ? (
-              /* Custom Futuristic Mobile Floating Button */
-              <button
-                onClick={() => setOpen(true)}
-                className="w-13.5 h-13.5 rounded-full flex items-center justify-center border border-cyan-500/40 bg-[#030303]/80 backdrop-blur-md shadow-[0_0_20px_rgba(6,182,212,0.35)] relative active:scale-90 transition-transform cursor-pointer font-bold"
-              >
-                {/* Breathing ping rings */}
-                <span className="absolute -inset-1.5 rounded-full border border-cyan-400/25 scale-100 animate-ping" style={{ animationDuration: "2.5s" }} />
-                <span className="absolute -inset-3.5 rounded-full border border-blue-500/10 scale-95 animate-pulse" />
+            {/* Breathing ping rings */}
+            <span className="absolute -inset-1.5 rounded-full border border-cyan-400/25 scale-100 animate-ping" style={{ animationDuration: "2.5s" }} />
+            <span className="absolute -inset-3.5 rounded-full border border-blue-500/10 scale-95 animate-pulse" />
 
-                {/* Small neon ping dot */}
-                <span className="absolute top-0.5 right-0.5 flex h-2.5 w-2.5 z-20">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-500" />
-                </span>
-
-                <div className="w-9 h-9 rounded-full flex items-center justify-center relative overflow-hidden shadow-inner">
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-cyan-400 to-indigo-600 animate-spin-slow scale-110" style={{ animationDuration: '7s' }} />
-                  <MessageSquare className="relative z-10 w-4 h-4 text-white" />
-                </div>
-              </button>
-            ) : (
-              /* Desktop Toggle Button (KEEP EXACTLY AS IS!) */
-              <button
-                onClick={() => setOpen(true)}
-                className="w-13.5 h-13.5 rounded-full flex items-center justify-center border border-blue-500/20 dark:border-white/10 bg-white dark:bg-[#07070a] hover:scale-105 active:scale-95 transition-all shadow-[0_8px_32px_rgba(59,130,246,0.22)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.65)] backdrop-blur-md relative group cursor-pointer"
-              >
-                {/* Breathing animated halos */}
-                <span className="absolute inset-0 rounded-full bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <span className="absolute -inset-2 rounded-full border border-blue-500/15 scale-100 group-hover:scale-110 opacity-70 group-hover:opacity-100 transition-all duration-700 animate-pulse" />
-                <span className="absolute -inset-3.5 rounded-full border border-cyan-500/10 scale-95 group-hover:scale-105 opacity-30 group-hover:opacity-50 transition-all duration-700 animate-pulse" style={{ animationDelay: "350ms" }} />
-
-                {/* Small neon ping dot */}
-                <span className="absolute top-0.5 right-0.5 flex h-2.5 w-2.5 z-20">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-500" />
-                </span>
-
-                {/* Outer rotating color ring */}
-                <div className="w-9 h-9 rounded-full flex items-center justify-center relative overflow-hidden shadow-inner">
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-cyan-400 to-indigo-600 animate-spin-slow scale-110" style={{ animationDuration: '9s' }} />
-                  <MessageSquare className="relative z-10 w-4 h-4 text-white group-hover:scale-110 transition-transform" />
-                </div>
-              </button>
+            {/* Small neon ping dot */}
+            {!open && (
+              <span className="absolute top-0.5 right-0.5 flex h-2.5 w-2.5 z-20">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-500" />
+              </span>
             )}
-          </motion.div>
+
+            <div className="w-9 h-9 rounded-full flex items-center justify-center relative overflow-hidden shadow-inner">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-cyan-400 to-indigo-600 animate-spin-slow scale-110" style={{ animationDuration: '7s' }} />
+              {open ? (
+                <X className="relative z-10 w-4 h-4 text-white animate-pulse" />
+              ) : (
+                <MessageSquare className="relative z-10 w-4 h-4 text-white" />
+              )}
+            </div>
+          </button>
+        ) : (
+          /* Desktop Toggle Button */
+          <button
+            onClick={() => setOpen(!open)}
+            className="w-14 h-14 rounded-full flex items-center justify-center border border-blue-500/20 dark:border-white/10 bg-white dark:bg-[#07070a] hover:scale-105 active:scale-95 transition-all shadow-[0_8px_32px_rgba(59,130,246,0.22)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.65)] backdrop-blur-md relative group cursor-pointer"
+          >
+            {/* Breathing animated halos */}
+            <span className="absolute inset-0 rounded-full bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <span className="absolute -inset-2 rounded-full border border-blue-500/15 scale-100 group-hover:scale-110 opacity-70 group-hover:opacity-100 transition-all duration-700 animate-pulse" />
+            <span className="absolute -inset-3.5 rounded-full border border-cyan-500/10 scale-95 group-hover:scale-105 opacity-30 group-hover:opacity-50 transition-all duration-700 animate-pulse" style={{ animationDelay: "350ms" }} />
+
+            {/* Small neon ping dot */}
+            {!open && (
+              <span className="absolute top-0.5 right-0.5 flex h-2.5 w-2.5 z-20">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-500" />
+              </span>
+            )}
+
+            {/* Outer rotating color ring */}
+            <div className="w-9 h-9 rounded-full flex items-center justify-center relative overflow-hidden shadow-inner">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-cyan-400 to-indigo-600 animate-spin-slow scale-110" style={{ animationDuration: '9s' }} />
+              {open ? (
+                <X className="relative z-10 w-4 h-4 text-white group-hover:scale-110 transition-transform animate-pulse" />
+              ) : (
+                <MessageSquare className="relative z-10 w-4 h-4 text-white group-hover:scale-110 transition-transform" />
+              )}
+            </div>
+          </button>
         )}
-      </AnimatePresence>
+      </div>
     </>
   );
 }

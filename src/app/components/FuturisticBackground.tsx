@@ -13,10 +13,13 @@ interface Particle {
 export function FuturisticBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const glowRef = useRef<HTMLDivElement>(null);
   const { temperature, theme } = useModelSettings();
-  const [mouse, setMouse] = useState({ x: 0, y: 0, targetX: 0, targetY: 0 });
   const [isMobile, setIsMobile] = useState(false);
+  
+  const mouseRef = useRef({ x: 0, y: 0, targetX: 0, targetY: 0 });
 
+  // Handle resize and mouse move
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
@@ -25,29 +28,32 @@ export function FuturisticBackground() {
     window.addEventListener("resize", handleResize, { passive: true });
 
     const handleMouseMove = (e: MouseEvent) => {
-      setMouse((prev) => ({
-        ...prev,
-        targetX: e.clientX,
-        targetY: e.clientY,
-      }));
+      mouseRef.current.targetX = e.clientX;
+      mouseRef.current.targetY = e.clientY;
     };
 
     let rafId: number;
     const isMobileViewport = window.innerWidth < 768;
 
     if (!isMobileViewport) {
+      // Set initial mouse position in center
+      mouseRef.current.x = window.innerWidth / 2;
+      mouseRef.current.y = window.innerHeight / 2;
+      mouseRef.current.targetX = window.innerWidth / 2;
+      mouseRef.current.targetY = window.innerHeight / 2;
+
       window.addEventListener("mousemove", handleMouseMove, { passive: true });
 
       const smoothMouse = () => {
-        setMouse((prev) => {
-          const dx = prev.targetX - prev.x;
-          const dy = prev.targetY - prev.y;
-          return {
-            ...prev,
-            x: prev.x + dx * 0.07,
-            y: prev.y + dy * 0.07,
-          };
-        });
+        const m = mouseRef.current;
+        const dx = m.targetX - m.x;
+        const dy = m.targetY - m.y;
+        m.x += dx * 0.07;
+        m.y += dy * 0.07;
+
+        if (glowRef.current) {
+          glowRef.current.style.transform = `translate3d(${m.x - 300}px, ${m.y - 300}px, 0)`;
+        }
         rafId = requestAnimationFrame(smoothMouse);
       };
 
@@ -118,9 +124,12 @@ export function FuturisticBackground() {
           for (let j = i + 1; j < particles.length; j++) {
             const p1 = particles[i];
             const p2 = particles[j];
-            const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+            const dx = p1.x - p2.x;
+            const dy = p1.y - p2.y;
+            const distSq = dx * dx + dy * dy;
 
-            if (dist < 100) {
+            if (distSq < 10000) { // 100 * 100 = 10000
+              const dist = Math.sqrt(distSq);
               const alpha = (1 - dist / 100) * (theme === "dark" ? 0.05 : 0.03);
               ctx.beginPath();
               ctx.moveTo(p1.x, p1.y);
@@ -150,11 +159,12 @@ export function FuturisticBackground() {
         // Cursor repulsion
         const dx = mouseX - p.x;
         const dy = mouseY - p.y;
-        const dist = Math.hypot(dx, dy);
-        if (dist < 140) {
+        const distSq = dx * dx + dy * dy;
+        if (distSq < 19600) { // 140 * 140 = 19600
+          const dist = Math.sqrt(distSq);
           const force = (140 - dist) / 140;
-          p.x -= (dx / dist) * force * 1.2;
-          p.y -= (dy / dist) * force * 1.2;
+          p.x -= (dx / (dist || 1)) * force * 1.2;
+          p.y -= (dy / (dist || 1)) * force * 1.2;
         }
 
         ctx.beginPath();
@@ -211,9 +221,10 @@ export function FuturisticBackground() {
       {/* 2. Soft Mouse Tracking Glow Overlay (Sleek light-source tracking) */}
       {!isMobile && (
         <div
+          ref={glowRef}
           className={`absolute w-[600px] h-[600px] rounded-full pointer-events-none filter blur-[80px] transition-opacity duration-500 ${theme === "dark" ? "opacity-100 bg-radial-gradient from-blue-500/4 via-indigo-500/1 to-transparent" : "opacity-30 bg-radial-gradient from-blue-400/8 via-cyan-400/2 to-transparent"}`}
           style={{
-            transform: `translate3d(${mouse.x - 300}px, ${mouse.y - 300}px, 0)`,
+            transform: `translate3d(${window.innerWidth / 2 - 300}px, ${window.innerHeight / 2 - 300}px, 0)`,
             willChange: "transform",
           }}
         />

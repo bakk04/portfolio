@@ -5,7 +5,32 @@ type AiOrbProps = {
 };
 
 export function AiOrb({ active = false }: AiOrbProps) {
-  const morphDuration = active ? 2.5 : 6;
+  const pathVariants = {
+    idle: {
+      d: [
+        "M 50,16 C 68,18 80,30 84,50 C 88,70 68,80 50,84 C 32,88 16,70 18,50 C 20,30 32,14 50,16 Z",
+        "M 50,20 C 70,26 80,20 78,50 C 76,80 62,80 50,80 C 38,80 26,76 22,50 C 18,24 30,14 50,20 Z",
+        "M 50,16 C 68,18 80,30 84,50 C 88,70 68,80 50,84 C 32,88 16,70 18,50 C 20,30 32,14 50,16 Z",
+      ],
+      transition: {
+        duration: 6,
+        repeat: Infinity,
+        ease: "easeInOut",
+      }
+    },
+    thinking: {
+      d: [
+        "M 50,14 C 70,12 82,25 80,50 C 78,75 72,78 50,84 C 28,82 18,72 16,50 C 14,28 30,16 50,14 Z",
+        "M 50,18 C 78,18 80,32 80,50 C 80,68 68,80 50,80 C 32,80 20,68 20,50 C 20,32 22,18 50,18 Z",
+        "M 50,14 C 70,12 82,25 80,50 C 78,75 72,78 50,84 C 28,82 18,72 16,50 C 14,28 30,16 50,14 Z",
+      ],
+      transition: {
+        duration: 2.5,
+        repeat: Infinity,
+        ease: "easeInOut",
+      }
+    }
+  };
 
   return (
     <div className="relative w-10 h-10 flex items-center justify-center select-none pointer-events-none">
@@ -44,30 +69,10 @@ export function AiOrb({ active = false }: AiOrbProps) {
         </defs>
 
         <motion.path
-          d="M 50,16 
-             C 68,18 80,30 84,50 
-             C 88,70 68,80 50,84 
-             C 32,88 16,70 18,50 
-             C 20,30 32,14 50,16 Z"
+          d="M 50,16 C 68,18 80,30 84,50 C 88,70 68,80 50,84 C 32,88 16,70 18,50 C 20,30 32,14 50,16 Z"
           fill={active ? "url(#geminiThinkingGradient)" : "url(#geminiOrbGradient)"}
-          animate={{
-            d: active
-              ? [
-                  "M 50,14 C 70,12 82,25 80,50 C 78,75 72,78 50,84 C 28,82 18,72 16,50 C 14,28 30,16 50,14 Z",
-                  "M 50,18 C 78,18 80,32 80,50 C 80,68 68,80 50,80 C 32,80 20,68 20,50 C 20,32 22,18 50,18 Z",
-                  "M 50,14 C 70,12 82,25 80,50 C 78,75 72,78 50,84 C 28,82 18,72 16,50 C 14,28 30,16 50,14 Z",
-                ]
-              : [
-                  "M 50,16 C 68,18 80,30 84,50 C 88,70 68,80 50,84 C 32,88 16,70 18,50 C 20,30 32,14 50,16 Z",
-                  "M 50,20 C 70,26 80,20 78,50 C 76,80 62,80 50,80 C 38,80 26,76 22,50 C 18,24 30,14 50,20 Z",
-                  "M 50,16 C 68,18 80,30 84,50 C 88,70 68,80 50,84 C 32,88 16,70 18,50 C 20,30 32,14 50,16 Z",
-                ],
-          }}
-          transition={{
-            duration: morphDuration,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
+          variants={pathVariants}
+          animate={active ? "thinking" : "idle"}
         />
       </svg>
     </div>

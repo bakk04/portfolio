@@ -23,6 +23,7 @@ export function InteractiveScene3D() {
     camera.position.set(0, 0.5, 8.5);
 
     const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+    const isDark = theme === "dark";
 
     // Renderer
     const renderer = new THREE.WebGLRenderer({
@@ -36,19 +37,19 @@ export function InteractiveScene3D() {
     container.appendChild(renderer.domElement);
 
     // --- Lighting ---
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.05);
+    const ambientLight = new THREE.AmbientLight(0xffffff, isDark ? 0.05 : 0.45);
     scene.add(ambientLight);
 
     // Glowing Neon lights reflecting off elements
-    const blueLight = new THREE.PointLight(0x3b82f6, 12, 15);
+    const blueLight = new THREE.PointLight(0x3b82f6, isDark ? 12 : 6, 15);
     blueLight.position.set(-3, 3, 2);
     scene.add(blueLight);
 
-    const cyanLight = new THREE.PointLight(0x06b6d4, 15, 12);
+    const cyanLight = new THREE.PointLight(0x06b6d4, isDark ? 15 : 8, 12);
     cyanLight.position.set(3, -2, 3);
     scene.add(cyanLight);
 
-    const purpleLight = new THREE.PointLight(0xa855f7, 8, 10);
+    const purpleLight = new THREE.PointLight(0xa855f7, isDark ? 8 : 4, 10);
     purpleLight.position.set(0, 4, -2);
     scene.add(purpleLight);
 
@@ -57,7 +58,9 @@ export function InteractiveScene3D() {
     gridHelper.position.set(0, -2.2, 0);
     (gridHelper.material as THREE.Material).transparent = true;
     (gridHelper.material as THREE.Material).opacity = 0.35;
-    scene.add(gridHelper);
+    if (!isMobile) {
+      scene.add(gridHelper);
+    }
 
     // --- Dynamic Holographic Screens with Live Text Canvas ---
     const createCodeTexture = (colorStr: string) => {
@@ -97,8 +100,10 @@ export function InteractiveScene3D() {
     hologramScreenR.position.set(1.3, 0.4, 1.2);
     hologramScreenR.rotation.set(0, -Math.PI / 6, 0);
 
-    scene.add(hologramScreenL);
-    scene.add(hologramScreenR);
+    if (!isMobile) {
+      scene.add(hologramScreenL);
+      scene.add(hologramScreenR);
+    }
 
     // Thin glowing frames around screens
     const frameGeo = new THREE.BufferGeometry().setFromPoints([
@@ -117,21 +122,27 @@ export function InteractiveScene3D() {
 
     // --- Interactive Globe in Background (Holographic Nodes) ---
     const globeGroup = new THREE.Group();
-    globeGroup.position.set(2.4, 1.2, -3);
+    if (isMobile) {
+      // Centered background orbital globe for mobile
+      globeGroup.position.set(0, 0.4, 0.5);
+      globeGroup.scale.set(1.15, 1.15, 1.15);
+    } else {
+      globeGroup.position.set(2.4, 1.2, -3);
+    }
     scene.add(globeGroup);
 
     const globeGeo = new THREE.SphereGeometry(1.6, 24, 24);
     const globeMat = new THREE.MeshBasicMaterial({
-      color: 0x3b82f6,
+      color: isDark ? 0x3b82f6 : 0x2563eb,
       wireframe: true,
       transparent: true,
-      opacity: 0.12,
+      opacity: isDark ? 0.12 : 0.22,
     });
     const globeMesh = new THREE.Mesh(globeGeo, globeMat);
     globeGroup.add(globeMesh);
 
     // Glowing network node points on the globe
-    const nodeCount = isMobile ? 15 : 30;
+    const nodeCount = isMobile ? 22 : 30;
     const nodePositions = new Float32Array(nodeCount * 3);
     const nodeSpeeds: number[] = [];
     const r = 1.6;
@@ -148,10 +159,10 @@ export function InteractiveScene3D() {
     const nodeGeo = new THREE.BufferGeometry();
     nodeGeo.setAttribute("position", new THREE.BufferAttribute(nodePositions, 3));
     const nodeMat = new THREE.PointsMaterial({
-      color: 0x00ffff,
-      size: 0.12,
+      color: isDark ? 0x00ffff : 0x0284c7,
+      size: isMobile ? 0.18 : 0.12,
       transparent: true,
-      opacity: 0.9,
+      opacity: isDark ? 0.9 : 0.7,
     });
     const globeNodes = new THREE.Points(nodeGeo, nodeMat);
     globeGroup.add(globeNodes);
@@ -159,7 +170,9 @@ export function InteractiveScene3D() {
     // --- Glowing Cloud Server Nodes (Mainframes) ---
     const serverGroup = new THREE.Group();
     serverGroup.position.set(-2.8, -0.6, -2);
-    scene.add(serverGroup);
+    if (!isMobile) {
+      scene.add(serverGroup);
+    }
 
     const serverGeo = new THREE.BoxGeometry(0.8, 1.4, 0.8);
     const serverMat = new THREE.MeshPhysicalMaterial({
@@ -178,7 +191,6 @@ export function InteractiveScene3D() {
     const ledCount = 12;
     const ledPositions = new Float32Array(ledCount * 3);
     for (let i = 0; i < ledCount; i++) {
-      // Front face indicator lights
       ledPositions[i * 3] = (Math.random() - 0.5) * 0.5;
       ledPositions[i * 3 + 1] = -0.6 + i * 0.11;
       ledPositions[i * 3 + 2] = 0.41;
@@ -191,7 +203,6 @@ export function InteractiveScene3D() {
       transparent: true,
       opacity: 0.95,
     });
-    // Create random colors (emerald green, amber, red)
     const ledColors = new Float32Array(ledCount * 3);
     for (let i = 0; i < ledCount * 3; i += 3) {
       if (Math.random() < 0.6) {
@@ -229,16 +240,22 @@ export function InteractiveScene3D() {
     };
     const serverBeam = createLightBeam(0x06b6d4);
     serverBeam.position.set(-2.8, 2.4, -2);
-    scene.add(serverBeam);
+    if (!isMobile) {
+      scene.add(serverBeam);
+    }
 
     const globeBeam = createLightBeam(0x3b82f6);
     globeBeam.position.set(2.4, 4.2, -3);
-    scene.add(globeBeam);
+    if (!isMobile) {
+      scene.add(globeBeam);
+    }
 
     // --- Cyber Hologram Engineer Avatar ---
     const engineerGroup = new THREE.Group();
     engineerGroup.position.set(0, -0.6, 0.5);
-    scene.add(engineerGroup);
+    if (!isMobile) {
+      scene.add(engineerGroup);
+    }
 
     // Wireframe Torso Shape
     const torsoGeo = new THREE.ConeGeometry(0.58, 1.25, 6, 4);
@@ -321,7 +338,7 @@ export function InteractiveScene3D() {
     engineerGroup.add(armR);
 
     // --- Dynamic Flowing Particle Swarm (Cloud Networks) ---
-    const swarmCount = isMobile ? 120 : 350;
+    const swarmCount = isMobile ? 80 : 350;
     const swarmGeo = new THREE.BufferGeometry();
     const swarmPositions = new Float32Array(swarmCount * 3);
     const swarmAngles: number[] = [];
@@ -332,17 +349,18 @@ export function InteractiveScene3D() {
     for (let i = 0; i < swarmCount; i++) {
       swarmAngles.push(Math.random() * Math.PI * 2);
       swarmSpeeds.push(Math.random() * 0.008 + 0.003);
-      swarmRadii.push(Math.random() * 2.8 + 1.2);
-      swarmHeights.push((Math.random() - 0.5) * 4);
+      // Swirl closer around the globe on mobile
+      swarmRadii.push(isMobile ? (Math.random() * 1.5 + 1.6) : (Math.random() * 2.8 + 1.2));
+      swarmHeights.push(isMobile ? ((Math.random() - 0.5) * 3) : ((Math.random() - 0.5) * 4));
     }
 
     swarmGeo.setAttribute("position", new THREE.BufferAttribute(swarmPositions, 3));
     const swarmMat = new THREE.PointsMaterial({
-      color: 0x3b82f6,
+      color: isDark ? 0x3b82f6 : 0x2563eb,
       size: 0.05,
       transparent: true,
-      opacity: 0.7,
-      blending: THREE.AdditiveBlending,
+      opacity: isDark ? 0.7 : 0.45,
+      blending: isDark ? THREE.AdditiveBlending : THREE.NormalBlending,
     });
     const swarmParticles = new THREE.Points(swarmGeo, swarmMat);
     scene.add(swarmParticles);
@@ -373,10 +391,12 @@ export function InteractiveScene3D() {
       });
     };
 
-    // Connect Server to Engineer Workstation and Workstation to Globe
-    createLink(new THREE.Vector3(-2.8, -0.6, -2), new THREE.Vector3(0, -0.3, 0.5));
-    createLink(new THREE.Vector3(0, -0.3, 0.5), new THREE.Vector3(2.4, 1.2, -3));
-    createLink(new THREE.Vector3(-2.8, 1, -2), new THREE.Vector3(2.4, 2.5, -3));
+    if (!isMobile) {
+      // Connect Server to Engineer Workstation and Workstation to Globe
+      createLink(new THREE.Vector3(-2.8, -0.6, -2), new THREE.Vector3(0, -0.3, 0.5));
+      createLink(new THREE.Vector3(0, -0.3, 0.5), new THREE.Vector3(2.4, 1.2, -3));
+      createLink(new THREE.Vector3(-2.8, 1, -2), new THREE.Vector3(2.4, 2.5, -3));
+    }
 
     // --- Interactive Mouse & Parallax State ---
     const mouse = { x: 0, y: 0, targetX: 0, targetY: 0 };
@@ -384,7 +404,11 @@ export function InteractiveScene3D() {
       mouse.targetX = (e.clientX / window.innerWidth) * 2 - 1;
       mouse.targetY = -(e.clientY / window.innerHeight) * 2 + 1;
     };
-    window.addEventListener("mousemove", handleMouseMove, { passive: true });
+    
+    // Only trace cursor mouse coordinates on desktop to save mobile processor cycles
+    if (!isMobile) {
+      window.addEventListener("mousemove", handleMouseMove, { passive: true });
+    }
 
     let scrollY = 0;
     const handleScroll = () => {
@@ -441,70 +465,102 @@ export function InteractiveScene3D() {
     };
 
     // --- Render Loop ---
-    const clock = new THREE.Clock();
+    const startTime = performance.now();
     let frameCount = 0;
     let animationId: number;
 
     const animate = () => {
-      const elapsedTime = clock.getElapsedTime();
+      const elapsedTime = (performance.now() - startTime) / 1000;
       frameCount++;
 
       // 1. Mouse inertia tracking
       mouse.x += (mouse.targetX - mouse.x) * 0.08;
       mouse.y += (mouse.targetY - mouse.y) * 0.08;
 
-      // 2. Cyber engineer look-at follow and breathing idle
-      head.rotation.y = mouse.x * 0.35;
-      head.rotation.x = -mouse.y * 0.2;
-      visor.rotation.y = -Math.PI / 2 + mouse.x * 0.35;
-      visor.rotation.z = mouse.y * 0.2;
+      if (!isMobile) {
+        // 2. Cyber engineer look-at follow and breathing idle (Desktop only)
+        head.rotation.y = mouse.x * 0.35;
+        head.rotation.x = -mouse.y * 0.2;
+        visor.rotation.y = -Math.PI / 2 + mouse.x * 0.35;
+        visor.rotation.z = mouse.y * 0.2;
 
-      const breathe = Math.sin(elapsedTime * 2.2) * 0.06;
-      engineerGroup.position.y = -0.6 + breathe;
+        const breathe = Math.sin(elapsedTime * 2.2) * 0.06;
+        engineerGroup.position.y = -0.6 + breathe;
 
-      // Typing fingers animation
-      handL.position.y = 0.12 + Math.sin(elapsedTime * 15) * 0.08;
-      handR.position.y = 0.12 + Math.cos(elapsedTime * 15) * 0.08;
+        // Typing fingers animation
+        handL.position.y = 0.12 + Math.sin(elapsedTime * 15) * 0.08;
+        handR.position.y = 0.12 + Math.cos(elapsedTime * 15) * 0.08;
 
-      // Arm connections reconstruction
-      armL.geometry.dispose();
-      armL.geometry = new THREE.BufferGeometry().setFromPoints([
-        shoulderL.position,
-        new THREE.Vector3(-0.5, 0.2 + breathe * 0.5, 0.3),
-        handL.position
-      ]);
+        // 2.5 Update Arm connections in-place (performance optimization: no geometry recreation)
+        const posL = armL.geometry.attributes.position.array as Float32Array;
+        posL[0] = shoulderL.position.x;
+        posL[1] = shoulderL.position.y;
+        posL[2] = shoulderL.position.z;
+        posL[3] = -0.5;
+        posL[4] = 0.2 + breathe * 0.5;
+        posL[5] = 0.3;
+        posL[6] = handL.position.x;
+        posL[7] = handL.position.y;
+        posL[8] = handL.position.z;
+        armL.geometry.attributes.position.needsUpdate = true;
 
-      armR.geometry.dispose();
-      armR.geometry = new THREE.BufferGeometry().setFromPoints([
-        shoulderR.position,
-        new THREE.Vector3(0.5, 0.2 + breathe * 0.5, 0.3),
-        handR.position
-      ]);
+        const posR = armR.geometry.attributes.position.array as Float32Array;
+        posR[0] = shoulderR.position.x;
+        posR[1] = shoulderR.position.y;
+        posR[2] = shoulderR.position.z;
+        posR[3] = 0.5;
+        posR[4] = 0.2 + breathe * 0.5;
+        posR[5] = 0.3;
+        posR[6] = handR.position.x;
+        posR[7] = handR.position.y;
+        posR[8] = handR.position.z;
+        armR.geometry.attributes.position.needsUpdate = true;
 
-      // 3. Floating hologram screens hover tilt
-      hologramScreenL.rotation.y = Math.PI / 6 + mouse.x * 0.08;
-      hologramScreenL.rotation.x = -mouse.y * 0.08;
-      hologramScreenR.rotation.y = -Math.PI / 6 + mouse.x * 0.08;
-      hologramScreenR.rotation.x = -mouse.y * 0.08;
+        // 3. Floating hologram screens hover tilt
+        hologramScreenL.rotation.y = Math.PI / 6 + mouse.x * 0.08;
+        hologramScreenL.rotation.x = -mouse.y * 0.08;
+        hologramScreenR.rotation.y = -Math.PI / 6 + mouse.x * 0.08;
+        hologramScreenR.rotation.x = -mouse.y * 0.08;
 
-      // 4. Update dynamic screen canvases
-      cursorPulse = (cursorPulse + 1) % 40;
-      if (frameCount % 60 === 0) {
-        lineOffset1++;
-        if (Math.random() < 0.5) lineOffset2++;
+        // 4. Update dynamic screen canvases
+        cursorPulse = (cursorPulse + 1) % 40;
+        if (frameCount % 60 === 0) {
+          lineOffset1++;
+          if (Math.random() < 0.5) lineOffset2++;
+        }
+        updateCanvasScreen(screen1, lines1, lineOffset1, "SYSTEM ENGINE LOGS");
+        updateCanvasScreen(screen2, lines2, lineOffset2, "CLOUDFLARE EDGE");
+
+        // Volumetric Beams pulsing
+        serverBeam.scale.set(1 + Math.sin(elapsedTime * 3) * 0.05, 1, 1 + Math.sin(elapsedTime * 3) * 0.05);
+        globeBeam.scale.set(1 + Math.cos(elapsedTime * 2) * 0.06, 1, 1 + Math.cos(elapsedTime * 2) * 0.06);
+
+        // Server LEDs flashing simulation
+        const ledColorsArr = serverLeds.geometry.attributes.color.array as Float32Array;
+        for (let i = 0; i < ledCount; i++) {
+          if (Math.random() < 0.1) {
+            const idx = i * 3;
+            ledColorsArr[idx + 1] = Math.random() < 0.6 ? 0.71 : 0.15;
+          }
+        }
+        serverLeds.geometry.attributes.color.needsUpdate = true;
+
+        // Flowing Data Packets
+        packetList.forEach((packet) => {
+          packet.progress += packet.speed;
+          if (packet.progress > 1) {
+            packet.progress = 0;
+          }
+          packet.mesh.position.lerpVectors(packet.start, packet.end, packet.progress);
+          packet.mesh.position.y += Math.sin(packet.progress * Math.PI) * 0.15; // Small arc shape
+        });
       }
-      updateCanvasScreen(screen1, lines1, lineOffset1, "SYSTEM ENGINE LOGS");
-      updateCanvasScreen(screen2, lines2, lineOffset2, "CLOUDFLARE EDGE");
 
-      // 5. Globe rotation & speeds
+      // 5. Globe rotation & speeds (Mobile and Desktop)
       globeGroup.rotation.y = elapsedTime * 0.06 + mouse.x * 0.12;
       globeGroup.rotation.x = elapsedTime * 0.02 + mouse.y * 0.08;
 
-      // 6. Volumetric Beams pulsing
-      serverBeam.scale.set(1 + Math.sin(elapsedTime * 3) * 0.05, 1, 1 + Math.sin(elapsedTime * 3) * 0.05);
-      globeBeam.scale.set(1 + Math.cos(elapsedTime * 2) * 0.06, 1, 1 + Math.cos(elapsedTime * 2) * 0.06);
-
-      // 7. Swirling Dynamic Particles Update
+      // 7. Swirling Dynamic Particles Update (Mobile and Desktop)
       const swarmArr = swarmParticles.geometry.attributes.position.array as Float32Array;
       for (let i = 0; i < swarmCount; i++) {
         swarmAngles[i] += swarmSpeeds[i];
@@ -514,33 +570,18 @@ export function InteractiveScene3D() {
       }
       swarmParticles.geometry.attributes.position.needsUpdate = true;
 
-      // 8. Server LEDs flashing simulation
-      const ledColorsArr = serverLeds.geometry.attributes.color.array as Float32Array;
-      for (let i = 0; i < ledCount; i++) {
-        if (Math.random() < 0.1) {
-          // Toggle color state slightly (dim/bright)
-          const idx = i * 3;
-          ledColorsArr[idx + 1] = Math.random() < 0.6 ? 0.71 : 0.15; // Green channel flash
-        }
-      }
-      serverLeds.geometry.attributes.color.needsUpdate = true;
-
-      // 9. Flowing Data Packets
-      packetList.forEach((packet) => {
-        packet.progress += packet.speed;
-        if (packet.progress > 1) {
-          packet.progress = 0;
-        }
-        packet.mesh.position.lerpVectors(packet.start, packet.end, packet.progress);
-        packet.mesh.position.y += Math.sin(packet.progress * Math.PI) * 0.15; // Small arc shape
-      });
-
       // 10. Scroll storytelling pan
       const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
       const scrollPercent = maxScroll > 0 ? scrollY / maxScroll : 0;
-      camera.position.z = 8.5 - scrollPercent * 2.8;
-      camera.position.y = 0.5 - scrollPercent * 1.5;
-      camera.lookAt(new THREE.Vector3(0 - scrollPercent * 0.8, -scrollPercent * 1.0, 0));
+      if (isMobile) {
+        camera.position.z = 8.5;
+        camera.position.y = 0.5;
+        camera.lookAt(new THREE.Vector3(0, 0.4, 0));
+      } else {
+        camera.position.z = 8.5 - scrollPercent * 2.8;
+        camera.position.y = 0.5 - scrollPercent * 1.5;
+        camera.lookAt(new THREE.Vector3(0 - scrollPercent * 0.8, -scrollPercent * 1.0, 0));
+      }
 
       renderer.render(scene, camera);
       animationId = requestAnimationFrame(animate);
@@ -560,7 +601,9 @@ export function InteractiveScene3D() {
 
     // --- Clean Up ---
     return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
+      if (!isMobile) {
+        window.removeEventListener("mousemove", handleMouseMove);
+      }
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("resize", handleResize);
       cancelAnimationFrame(animationId);
@@ -604,6 +647,8 @@ export function InteractiveScene3D() {
       handGeo.dispose();
       handMat.dispose();
       lineMat.dispose();
+      armL.geometry.dispose();
+      armR.geometry.dispose();
       swarmGeo.dispose();
       swarmMat.dispose();
       packetList.forEach((p) => {
@@ -618,7 +663,7 @@ export function InteractiveScene3D() {
   return (
     <div
       ref={containerRef}
-      className="w-full h-full min-h-[300px] sm:min-h-[400px] lg:min-h-[500px] relative pointer-events-none select-none z-10"
+      className="w-full h-full min-h-[320px] relative pointer-events-none select-none z-10"
       style={{ touchAction: "none" }}
     />
   );
