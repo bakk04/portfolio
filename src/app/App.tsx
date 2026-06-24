@@ -19,6 +19,8 @@ import { NeuralNetwork } from "./components/NeuralNetwork";
 import { AskYounesAi } from "./components/AskYounesAi";
 import { TokenizerPlayground } from "./components/TokenizerPlayground";
 import { TelemetryWave } from "./components/TelemetryWave";
+import { HeroVisual } from "./components/HeroVisual";
+import { Skills } from "./components/Skills";
 
 // ─── Translations ─────────────────────────────────────────────
 const T = {
@@ -508,81 +510,100 @@ function HeroMagneticBtn({ onClick, children, primary }: HeroMagneticBtnProps) {
 }
 
 // ─── Luxurious Apple-Style Hero (Google AI Wave Mesh Background) ──
+// ─── Luxurious Apple-Style Hero (Google AI Wave Mesh Background) ──
 function HeroSection({ lang, onNavigate }: { lang: Lang; onNavigate: (id: string) => void }) {
   const t = T[lang];
 
   return (
-    <section id="hero" className="relative min-h-screen flex flex-col justify-center overflow-hidden">
+    <section id="hero" className="relative min-h-screen flex items-center overflow-hidden">
       {/* Dynamic waving color mesh backdrop */}
       <GeminiWaveMesh />
 
-      <div className="max-w-4xl mx-auto px-6 md:px-8 w-full pt-32 pb-16 relative z-10 flex flex-col items-center text-center">
-        
-        {/* Available Badge */}
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-          className="mb-8 inline-flex items-center gap-2 px-4 py-2 rounded-full border text-[9px] uppercase tracking-wider font-mono font-bold bg-blue-500/[0.04] text-blue-600 dark:text-blue-400 border-blue-500/25 shadow-sm"
-        >
-          <span className="relative flex h-1.5 w-1.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-blue-500" />
-          </span>
-          {t.available}
-        </motion.div>
+      <div className="max-w-6xl mx-auto px-6 md:px-8 w-full pt-32 pb-16 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center text-left">
+          
+          {/* Left Text Column */}
+          <div className="lg:col-span-7 flex flex-col items-start">
+            {/* Available Badge */}
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+              className="mb-6 inline-flex items-center gap-2 px-4 py-2 rounded-full border text-[9px] uppercase tracking-wider font-mono font-bold bg-blue-500/[0.04] text-blue-600 dark:text-blue-400 border-blue-500/25 shadow-sm"
+            >
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-blue-500" />
+              </span>
+              {t.available}
+            </motion.div>
 
-        {/* Large Name Display */}
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-          className="text-5xl sm:text-7xl md:text-8.5xl font-black font-display tracking-tight leading-[0.92] mb-8 select-none"
-        >
-          <span className="block text-slate-900 dark:text-white">Younes Bakkali</span>
-          <span className="block gradient-text">Terghi</span>
-        </motion.h1>
+            {/* Large Name Display */}
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+              className="text-5xl sm:text-6xl md:text-7.5xl font-black font-display tracking-tight leading-[0.95] mb-6 select-none"
+            >
+              <span className="block text-slate-500 dark:text-slate-400 text-lg font-mono uppercase tracking-widest font-bold mb-3">{t.heroGreeting}</span>
+              <span className="block text-slate-900 dark:text-white">Younes Bakkali</span>
+              <span className="block gradient-text">Terghi</span>
+            </motion.h1>
 
-        {/* Specialty Label */}
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.4 }}
-          className="text-lg md:text-2xl font-bold font-display tracking-tight mb-4 text-slate-800 dark:text-slate-200 select-none uppercase font-mono"
-        >
-          Software Engineer & AI Architect
-        </motion.p>
+            {/* Specialty Label - Professional subtitle */}
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.4 }}
+              className="text-xs sm:text-sm md:text-md font-bold font-mono tracking-wide mb-6 text-slate-800 dark:text-slate-200 select-none uppercase border-l-2 border-blue-500 pl-4 py-1"
+            >
+              Software Engineer | Full Stack Developer | Networks & Systems Engineer
+            </motion.p>
 
-        {/* Short Biography */}
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.5 }}
-          className="max-w-2xl text-xs md:text-sm leading-relaxed opacity-75 text-muted-foreground font-body mb-12 select-none"
-        >
-          {lang === "en"
-            ? "4th-Year Software Engineering Majorant (1st) at EMSI Rabat. Architecting high-performance web systems, TinyML Edge computation nodes, and deep AI model integrations."
-            : "Élève Ingénieur de 4ème Année & Major de Promotion (1er) à l'EMSI Rabat. Spécialiste du développement full-stack haut de gamme, de l'IA embarquée et des architectures distribuées."}
-        </motion.p>
+            {/* Short Biography */}
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.5 }}
+              className="text-xs md:text-sm leading-relaxed opacity-75 text-muted-foreground font-body mb-8 select-none max-w-xl"
+            >
+              {lang === "en"
+                ? "4th-Year Software Engineering Majorant (1st) at EMSI Rabat. Architecting high-performance web systems, TinyML Edge computation nodes, and deep AI model integrations."
+                : "Élève Ingénieur de 4ème Année & Major de Promotion (1er) à l'EMSI Rabat. Spécialiste du développement full-stack haut de gamme, de l'IA embarquée et des architectures distribuées."}
+            </motion.p>
 
-        {/* CTA Buttons */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.6 }}
-          className="flex flex-wrap gap-4 justify-center"
-        >
-          <HeroMagneticBtn onClick={() => onNavigate("projects")} primary>
-            {t.heroCta1}
-            <svg className="ml-2 transition-transform duration-200 group-hover:translate-x-0.5" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path d="M5 12h14M12 5l7 7-7 7"/>
-            </svg>
-          </HeroMagneticBtn>
-          <HeroMagneticBtn onClick={() => onNavigate("contact")}>
-            {t.heroCta2}
-          </HeroMagneticBtn>
-        </motion.div>
+            {/* CTA Buttons */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.6 }}
+              className="flex flex-wrap gap-4"
+            >
+              <HeroMagneticBtn onClick={() => onNavigate("projects")} primary>
+                {t.heroCta1}
+                <svg className="ml-2 transition-transform duration-200 group-hover:translate-x-0.5" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+              </HeroMagneticBtn>
+              <HeroMagneticBtn onClick={() => onNavigate("contact")}>
+                {t.heroCta2}
+              </HeroMagneticBtn>
+            </motion.div>
+          </div>
 
+          {/* Right Stunning Animated Column */}
+          <div className="lg:col-span-5 flex justify-center w-full">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
+              className="w-full flex justify-center"
+            >
+              <HeroVisual />
+            </motion.div>
+          </div>
+
+        </div>
       </div>
     </section>
   );
@@ -704,71 +725,7 @@ function AboutSection({ lang }: { lang: Lang }) {
 }
 
 // ─── Skills Section (Neural network Flow) ──────────────────────
-function SkillsSection({ lang }: { lang: Lang }) {
-  const t = T[lang];
-
-  return (
-    <section id="skills" className="py-24">
-      <div className="max-w-5xl mx-auto px-6 md:px-8">
-        <CinematicScrollReveal direction="up" intensity="cinematic">
-          <div className="section-label mb-6">{t.skillsLabel}</div>
-          <h2
-            className="mb-12 font-extrabold tracking-tight text-4xl sm:text-5xl font-display"
-            style={{ lineHeight: 1.15 }}
-          >
-            {t.skillsTitle}
-          </h2>
-
-          <div className="grid lg:grid-cols-12 gap-6 items-center">
-            {/* Left: Skills list */}
-            <div className="lg:col-span-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {SKILLS.map((skill, i) => (
-                <SkillCard key={i} skill={skill} />
-              ))}
-            </div>
-
-            {/* Right: Mesh visualization */}
-            <div className="lg:col-span-6 h-full">
-              <NeuralNetwork />
-            </div>
-          </div>
-        </CinematicScrollReveal>
-      </div>
-    </section>
-  );
-}
-
-function SkillCard({ skill }: { skill: typeof SKILLS[0] }) {
-  return (
-    <PerspectiveCard
-      maxTilt={5}
-      className="p-6 cursor-default h-full flex flex-col gap-4"
-    >
-      <div className="flex items-center gap-3">
-        <div
-          className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold border border-slate-100 dark:border-slate-800"
-          style={{ background: `${skill.color}12`, color: skill.color }}
-        >
-          {skill.icon}
-        </div>
-        <span className="font-bold text-xs uppercase tracking-wide text-foreground font-mono">
-          {skill.name}
-        </span>
-      </div>
-
-      <div className="flex flex-wrap gap-1.5">
-        {skill.items.map((item) => (
-          <span
-            key={item}
-            className="text-[9px] px-2.5 py-0.5 rounded-full border border-black/[0.04] dark:border-white/[0.04] bg-slate-50 dark:bg-white/[0.03] text-muted-foreground font-mono"
-          >
-            {item}
-          </span>
-        ))}
-      </div>
-    </PerspectiveCard>
-  );
-}
+// (Modular Skills component is loaded from components/Skills)
 
 // ─── Projects Section (Sleek visual layouts & stats) ──────────
 function ProjectsSection({ lang }: { lang: Lang }) {
@@ -1351,7 +1308,7 @@ function PortfolioContent() {
         <HeroSection lang={lang} onNavigate={handleNavigate} />
         <SkillsMarquee />
         <AboutSection lang={lang} />
-        <SkillsSection lang={lang} />
+        <Skills />
         <ProjectsSection lang={lang} />
         <TimelineSection lang={lang} />
         <CertificationsSection lang={lang} />

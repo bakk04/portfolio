@@ -40,19 +40,17 @@ function LangPill() {
         <button
           key={l}
           onClick={() => setLang(l)}
-          className="relative px-2 py-0.5 text-[8.5px] font-bold tracking-wider rounded-full uppercase z-10 cursor-pointer"
+          className="relative px-2.5 py-0.5 text-[8.5px] font-bold tracking-wider rounded-full uppercase z-10 cursor-pointer"
           style={{
             fontFamily: "var(--font-mono)",
-            color: lang === l 
-              ? "#ffffff" 
-              : "var(--muted-foreground)",
+            color: lang === l ? "#ffffff" : "var(--muted-foreground)",
           }}
         >
           {lang === l && (
             <motion.div
               layoutId="headerLang"
               className="absolute inset-0 bg-blue-600 dark:bg-blue-500 rounded-full -z-10"
-              transition={{ type: "spring", stiffness: 400, damping: 32 }}
+              transition={{ type: "spring", stiffness: 450, damping: 32 }}
             />
           )}
           {l}
@@ -62,15 +60,12 @@ function LangPill() {
   );
 }
 
-export function Header({
-  nav,
-  activeSection,
-  onNavigate,
-}: HeaderProps) {
-  const { theme, setTheme } = useModelSettings();
+export function Header({ nav, activeSection, onNavigate }: HeaderProps) {
+  const { theme, setTheme, lang } = useModelSettings();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const logoMagnetic = useMagnetic(0.18);
+  const [hoveredNav, setHoveredNav] = useState<string | null>(null);
+  const logoMagnetic = useMagnetic(0.15);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -92,7 +87,7 @@ export function Header({
       <motion.header
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+        transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.25 }}
         className="fixed top-5 left-0 right-0 z-[100] flex justify-center px-6 pointer-events-none"
       >
         <nav
@@ -101,60 +96,75 @@ export function Header({
               ? "bg-white/80 dark:bg-[#07070a]/75 border-black/5 dark:border-white/[0.08] shadow-[0_12px_40px_rgba(0,0,0,0.06)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.4)] scale-[0.98]"
               : "bg-white/40 dark:bg-[#07070a]/35 border-black/5 dark:border-white/[0.04] shadow-sm"
           }`}
-          style={{ 
+          style={{
             WebkitBackdropFilter: "blur(24px) saturate(1.8)",
-            willChange: "transform, background-color, border-color"
+            willChange: "transform, background-color, border-color",
           }}
         >
-          {/* Logo */}
+          {/* Animated Logo */}
           <div className="flex items-center gap-3">
             <button
               ref={logoMagnetic.ref}
               onMouseMove={logoMagnetic.onMouseMove}
               onMouseLeave={logoMagnetic.onMouseLeave}
               onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              className="flex items-center gap-2 py-1 rounded-full hover:bg-black/5 dark:hover:bg-white/[0.03] transition-colors duration-300 group cursor-pointer pr-3 pl-1.5"
+              className="flex items-center gap-2.5 py-1.5 px-3.5 rounded-full border border-black/5 dark:border-white/[0.05] bg-white/50 dark:bg-black/30 transition-all duration-300 hover:border-blue-500/30 group cursor-pointer relative overflow-hidden"
               style={{ willChange: "transform" }}
             >
+              {/* Spinning Shifting Gradient Badge */}
               <div
-                className="w-6.5 h-6.5 rounded-full flex items-center justify-center text-[9px] font-black text-white"
-                style={{
-                  background: "linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)",
-                  fontFamily: "var(--font-display)",
-                }}
+                className="w-6 h-6 rounded-full flex items-center justify-center text-[8.5px] font-black text-white shrink-0 shadow-sm relative overflow-hidden"
               >
-                YBT
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-cyan-500 to-indigo-600 animate-spin-slow scale-110" style={{ animationDuration: '4s' }} />
+                <span className="relative z-10">Y</span>
               </div>
               <span
-                className="text-[11px] font-extrabold tracking-tight text-slate-800 dark:text-slate-100"
-                style={{ fontFamily: "var(--font-display)" }}
+                className="text-[11.5px] font-extrabold tracking-tight text-slate-800 dark:text-slate-100 flex items-center gap-1 font-display"
               >
-                Younes Bakkali
+                Younes <span className="text-blue-500 font-medium">Bakkali</span>
               </span>
             </button>
           </div>
 
           {/* Desktop Navigation Links */}
-          <div className="hidden md:flex items-center gap-1">
+          <div className="hidden md:flex items-center gap-1 relative">
             {nav.map(({ label, id }) => (
               <button
                 key={id}
                 onClick={() => handleNav(id)}
-                className={`relative px-3.5 py-1.5 text-[10px] font-bold tracking-wide rounded-full transition-all duration-300 cursor-pointer ${
+                onMouseEnter={() => setHoveredNav(id)}
+                onMouseLeave={() => setHoveredNav(null)}
+                className={`relative px-4 py-1.5 text-[10px] font-bold tracking-wide rounded-full transition-all duration-300 cursor-pointer ${
                   activeSection === id
                     ? "text-slate-950 dark:text-foreground font-extrabold"
-                    : "text-slate-500 dark:text-muted-foreground hover:text-slate-900 dark:hover:text-white"
+                    : "text-slate-500 dark:text-muted-foreground hover:text-slate-950 dark:hover:text-white"
                 }`}
                 style={{ fontFamily: "var(--font-body)" }}
               >
-                {label}
+                <span className="relative z-10">{label}</span>
+                
+                {/* Active Underline menu animation */}
                 {activeSection === id && (
                   <motion.div
-                    layoutId="navPill"
-                    className="absolute inset-0 rounded-full bg-slate-100/80 dark:bg-white/[0.05] -z-10"
-                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                    layoutId="navUnderline"
+                    className="absolute bottom-0 left-3 right-3 h-[2.5px] bg-blue-500 dark:bg-blue-400 rounded-full"
+                    transition={{ type: "spring", stiffness: 420, damping: 30 }}
                   />
                 )}
+
+                {/* Vercel-like hover backdrop capsule */}
+                <AnimatePresence>
+                  {hoveredNav === id && (
+                    <motion.div
+                      layoutId="hoverCapsule"
+                      className="absolute inset-0 rounded-full bg-slate-100/60 dark:bg-white/[0.04] -z-10"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ type: "spring", stiffness: 450, damping: 32 }}
+                    />
+                  )}
+                </AnimatePresence>
               </button>
             ))}
           </div>
@@ -166,7 +176,7 @@ export function Header({
             {/* Light/Dark Toggle */}
             <button
               onClick={toggleTheme}
-              className="w-7 h-7 rounded-full flex items-center justify-center border border-black/5 dark:border-white/[0.08] bg-black/5 dark:bg-white/[0.03] hover:bg-black/10 dark:hover:bg-white/[0.06] transition-all duration-300 text-slate-600 dark:text-muted-foreground hover:text-slate-950 dark:hover:text-white cursor-pointer"
+              className="w-7.5 h-7.5 rounded-full flex items-center justify-center border border-black/5 dark:border-white/[0.08] bg-black/5 dark:bg-white/[0.03] hover:bg-black/10 dark:hover:bg-white/[0.06] transition-all duration-300 text-slate-600 dark:text-muted-foreground hover:text-slate-950 dark:hover:text-white cursor-pointer"
               aria-label="Toggle theme"
             >
               {theme === "dark" ? (
@@ -188,10 +198,18 @@ export function Header({
               )}
             </button>
 
+            {/* Premium CTA Button "Contact Me" */}
+            <button
+              onClick={() => handleNav("contact")}
+              className="relative hidden sm:flex items-center justify-center h-8 px-4 rounded-full font-mono text-[9px] uppercase tracking-widest bg-slate-900 text-white dark:bg-white dark:text-slate-950 hover:bg-blue-600 dark:hover:bg-blue-500 hover:text-white transition-all duration-300 cursor-pointer active:scale-95 z-10 shrink-0 font-bold hover:shadow-lg hover:shadow-blue-500/10 border border-black/10 dark:border-white/10"
+            >
+              {lang === "en" ? "Contact Me" : "Me Contacter"}
+            </button>
+
             {/* Mobile Menu Icon */}
             <button
               onClick={() => setMenuOpen((v) => !v)}
-              className="md:hidden w-7 h-7 rounded-full flex items-center justify-center border border-black/5 dark:border-white/[0.08] bg-black/5 dark:bg-white/[0.03] text-slate-600 dark:text-muted-foreground hover:text-slate-950 dark:hover:text-white cursor-pointer"
+              className="md:hidden w-7.5 h-7.5 rounded-full flex items-center justify-center border border-black/5 dark:border-white/[0.08] bg-black/5 dark:bg-white/[0.03] text-slate-600 dark:text-muted-foreground hover:text-slate-950 dark:hover:text-white cursor-pointer"
               aria-label="Menu"
             >
               {menuOpen ? (
@@ -240,6 +258,12 @@ export function Header({
                 {label}
               </button>
             ))}
+            <button
+              onClick={() => handleNav("contact")}
+              className="w-full px-6 py-4 text-center text-xs text-white bg-blue-600 hover:bg-blue-500 font-bold transition-colors cursor-pointer"
+            >
+              {lang === "en" ? "Contact Me" : "Me Contacter"}
+            </button>
           </motion.div>
         )}
       </AnimatePresence>
